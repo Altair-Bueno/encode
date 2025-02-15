@@ -8,7 +8,7 @@ license = "MIT"
 homepage = "https://github.com/Altair-Bueno/encode"
 repository = "https://github.com/Altair-Bueno/encode"
 readme = "README.md"
-keywords = ["no-std::no-alloc", "no-std", "encoding"]
+keywords = ["encoding", "no-std", "no-alloc", "framework"]
 categories = ["encoding", "no-std"]
 authors = ["Altair Bueno"]
 
