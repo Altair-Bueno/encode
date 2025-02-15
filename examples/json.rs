@@ -71,7 +71,7 @@ impl<E: Encoder> Encodable<E> for Json {
             // Notice how we can use tuples to add the bracket prefix and suffix to the object.
             Json::Object(o) => (
                 '{',
-                Separated::new(o.into_iter().map(|(k, v)| (JsonString(k), ':', v)), ','),
+                Separated::new(o.iter().map(|(k, v)| (JsonString(k), ':', v)), ','),
                 '}',
             )
                 .encode(encoder),
