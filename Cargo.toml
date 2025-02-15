@@ -1,0 +1,36 @@
+[package]
+name = "encode"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.84.0"
+description = "A simple framework for encoding binary data."
+license = "MIT"
+homepage = "https://github.com/Altair-Bueno/encode"
+repository = "https://github.com/Altair-Bueno/encode"
+readme = "README.md"
+keywords = ["no-std::no-alloc", "no-std", "encoding"]
+categories = ["encoding", "no-std"]
+authors = ["Altair Bueno"]
+
+[package.metadata.docs.rs]
+all-features = true
+
+[features]
+default = ["std"]
+std = ["thiserror/std"]
+alloc = []
+arrayvec = ["dep:arrayvec"]
+
+[dependencies]
+arrayvec = { version = "0.7.6", optional = true, default-features = false }
+cfg-if = "1"
+paste = "1"
+thiserror = { version = "2", default-features = false }
+
+[[example]]
+name = "json"
+required-features = ["std"]
+
+[[example]]
+name = "bson"
+required-features = ["std"]
