@@ -9,15 +9,12 @@
 //! cargo run --example bson
 //! ```
 
-use std::convert::Infallible;
-use std::num::TryFromIntError;
+use core::convert::Infallible;
+use core::num::TryFromIntError;
 
-use encode::combinators::FromError;
-use encode::combinators::Iter;
-use encode::combinators::LengthPrefix;
-use encode::combinators::LE;
-use encode::Encodable;
-use encode::EncodableSize;
+use encode::combinators::{FromError, Iter, LengthPrefix, LE};
+use encode::encoders::InsufficientSpace;
+use encode::{Encodable, EncodableSize};
 
 /// A BSON encoding error.
 ///
@@ -27,18 +24,31 @@ use encode::EncodableSize;
 /// need to handle the case where there is not enough space in the buffer to
 /// encode the BSON document, as well as any other errors that may occur during
 /// encoding.
-///
-/// We are using the `thiserror` crate to simplify error handling. You could also
-/// use something like `Box<dyn std::error::Error>` or the `anyhow` crate if you
-/// don't care about performance or custom error types.
-#[derive(Debug, Clone, PartialEq, thiserror::Error)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum BsonError {
-    #[error("failed to encode BSON because it is too large")]
-    TooLarge(#[from] TryFromIntError),
-    #[error(transparent)]
-    InsufficientSpace(#[from] encode::encoders::InsufficientSpace),
+    TooLarge(TryFromIntError),
+    InsufficientSpace(InsufficientSpace),
 }
 
+impl core::error::Error for BsonError {}
+impl core::fmt::Display for BsonError {
+    fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
+        match self {
+            BsonError::TooLarge(_) => write!(f, "failed to encode BSON because it is too large"),
+            BsonError::InsufficientSpace(err) => core::fmt::Display::fmt(err, f),
+        }
+    }
+}
+impl From<TryFromIntError> for BsonError {
+    fn from(err: TryFromIntError) -> Self {
+        BsonError::TooLarge(err)
+    }
+}
+impl From<InsufficientSpace> for BsonError {
+    fn from(err: InsufficientSpace) -> Self {
+        BsonError::InsufficientSpace(err)
+    }
+}
 impl From<Infallible> for BsonError {
     fn from(_: Infallible) -> Self {
         unreachable!("infallible cannot be constructed")
