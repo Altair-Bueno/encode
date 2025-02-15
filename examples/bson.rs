@@ -239,7 +239,7 @@ fn main() -> Result<(), BsonError> {
 
 #[cfg(test)]
 mod official_examples {
-    //! Tests using oficial examples from BSON specification https://bsonspec.org/faq.html
+    //! Tests using official examples from BSON specification https://bsonspec.org/faq.html
     use super::*;
 
     #[test]
