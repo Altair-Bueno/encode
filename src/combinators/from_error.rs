@@ -8,12 +8,14 @@ use core::ops::Deref;
 /// # Example
 ///
 /// ```
+/// # #[cfg(feature = "alloc")] {
 /// use encode::Encodable;
 /// use encode::combinators::FromError;
 ///
 /// let mut buf = Vec::new();
 /// FromError::<_, std::num::TryFromIntError>::new("hello").encode(&mut buf).unwrap();
 /// assert_eq!(&buf, b"hello");
+/// # }
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 #[repr(transparent)]

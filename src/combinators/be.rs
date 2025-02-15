@@ -8,12 +8,14 @@ use crate::Encoder;
 /// # Examples
 ///
 /// ```rust
+/// # #[cfg(feature = "alloc")] {
 /// use encode::Encodable;
 /// use encode::combinators::BE;
 ///
 /// let mut buf = Vec::new();
 /// BE::new(1u16).encode(&mut buf).unwrap();
 /// assert_eq!(&buf, &[0, 1], "Encoding a u16 in big-endian order means the most significant byte comes first");
+/// # }
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct BE<E> {

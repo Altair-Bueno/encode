@@ -3,6 +3,7 @@
 /// # Example
 ///
 /// ```
+/// # #[cfg(feature = "alloc")] {
 /// use encode::Encodable;
 /// use encode::combinators::Iter;
 ///
@@ -13,6 +14,7 @@
 /// let mut buf = Vec::new();
 /// Iter::new(&compact_map).encode(&mut buf).unwrap();
 /// assert_eq!(&buf, b"hello\0\x01world\0\x02");
+/// # }
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 #[repr(transparent)]

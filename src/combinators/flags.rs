@@ -9,21 +9,25 @@ use crate::Encoder;
 /// # Examples
 ///
 /// ```
+/// # #[cfg(feature = "alloc")] {
 /// use encode::Encodable;
 /// use encode::combinators::Flags;
 ///
 /// let mut buf = Vec::new();
 /// Flags::new([false,false,false,false,false,false,false, false]).encode(&mut buf).unwrap();
 /// assert_eq!(&buf, &[0]);
+/// # }
 /// ```
 ///
 /// ```
+/// # #[cfg(feature = "alloc")] {
 /// use encode::Encodable;
 /// use encode::combinators::Flags;
 ///
 /// let mut buf = Vec::new();
 /// Flags::new([true,false,false,true,false,false,false, false]).encode(&mut buf).unwrap();
 /// assert_eq!(&buf, &[0b1001_0000]);
+/// # }
 /// ```
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 #[repr(transparent)]
