@@ -249,16 +249,6 @@ jobs:
         with:
           target: ${{ matrix.target }}
 
-      - uses: taiki-e/upload-rust-binary-action@v1
-        with:
-          bin: ${{ github.event.repository.name }}
-          target: ${{ matrix.target }}
-          include: attribution
-          archive: $bin-$tag-$target
-          token: ${{ secrets.GITHUB_TOKEN }}
-          ref: refs/tags/${{  needs.get-version.outputs.new_tag_version }}
-          checksum: sha256
-
   publish-crate:
     needs: [create-tag]
     if: ${{ inputs.publish }}
