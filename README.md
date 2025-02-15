@@ -39,3 +39,33 @@ crate.
 - `std`: Enables the use of the standard library.
 - `alloc`: Enables the use of the `alloc` crate.
 - `arrayvec`: Implements [`Encodable`] for [`arrayvec::ArrayVec`].
+
+## FAQs
+
+### Why the `Encoder` trait instead of `bytes::BufMut`?
+
+From
+[bytes documentation](https://docs.rs/bytes/latest/bytes/buf/trait.BufMut.html)
+
+> A buffer stores bytes in memory such that write operations are **infallible**.
+> The underlying storage may or may not be in contiguous memory. A BufMut value
+> is a cursor into the buffer. Writing to BufMut advances the cursor position.
+
+The bytes crate was never designed with falible writes nor `no_std` targets in
+mind. This means that targets with little memory are forced to crash when memory
+is low, instead of gracefully handling errors.
+
+### Why the `Encoder` trait instead of `std::io::Write`?
+
+Because
+[it's not available on `no_std`](https://github.com/rust-lang/rust/issues/48331)
+
+### Why did you build this?
+
+- Because there is no alternative, at least that i know of, that supports
+  `no_std` properly
+- Because it easily lets you create
+  [TLV types](https://en.wikipedia.org/wiki/Type–length–value)
+- Because it's easier to work with than `std::io::Write` and `std::fmt::Write`
+- Because using `format_args!` with binary data often leads to a lot of
+  boilerplate
