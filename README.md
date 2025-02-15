@@ -1,5 +1,9 @@
 # Encode, a Rust library for building encoders and serializers
 
+[![LICENSE](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![CI](https://github.com/Altair-Bueno/encode/actions/workflows/ci.yaml/badge.svg)](https://github.com/Altair-Bueno/encode/actions/workflows/ci.yaml)
+[![Crates.io Version](https://img.shields.io/crates/v/encode.svg)](https://crates.io/crates/encode)
+
 > Encoders/serializers made easy.
 
 `encode` is a toolbox for building encoders and serializers in Rust. It is
