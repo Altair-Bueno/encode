@@ -1,16 +1,6 @@
-cfg_if::cfg_if!(
-    if #[cfg(feature = "std")] {
-        use std as reexport;
-    } else if #[cfg(feature = "alloc")] {
-        extern crate alloc;
-
-        use alloc as reexport;
-    }
-);
-
-use reexport::vec::Vec;
-
 use crate::Encoder;
+#[cfg(feature = "alloc")]
+use alloc::vec::Vec;
 
 impl Encoder for Vec<u8> {
     type Error = core::convert::Infallible;
@@ -28,7 +18,7 @@ impl Encoder for Vec<u8> {
 
 #[cfg(test)]
 mod test {
-    use crate::Encoder;
+    use super::*;
 
     #[test]
     fn assert_that_vec_grows() {
