@@ -1,3 +1,5 @@
+# Encode, a Rust library for building encoders and serializers
+
 > Encoders/serializers made easy.
 
 `encode` is a toolbox for building encoders and serializers in Rust. It is
