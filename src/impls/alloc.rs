@@ -1,20 +1,7 @@
-cfg_if::cfg_if!(
-    if #[cfg(feature = "std")] {
-        use std as reexport;
-    } else if #[cfg(feature = "alloc")] {
-        extern crate alloc;
-
-        use alloc as reexport;
-    }
-);
-
-use reexport::borrow::Cow;
-use reexport::boxed::Box;
-use reexport::string::String;
-use reexport::vec::Vec;
-
 use crate::Encodable;
 use crate::Encoder;
+#[cfg(feature = "alloc")]
+use alloc::{borrow::Cow, boxed::Box, string::String, vec::Vec};
 
 impl<E: Encoder> Encodable<E> for Vec<u8> {
     type Error = E::Error;

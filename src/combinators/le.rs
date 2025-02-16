@@ -8,12 +8,14 @@ use crate::Encoder;
 /// # Examples
 ///
 /// ```rust
+/// # #[cfg(feature = "alloc")] {
 /// use encode::Encodable;
 /// use encode::combinators::LE;
 ///
 /// let mut buf = Vec::new();
 /// LE::new(1u16).encode(&mut buf).unwrap();
 /// assert_eq!(&buf, &[1, 0], "Encoding a u16 in little-endian order means the least significant byte comes first");
+/// # }
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct LE<E> {

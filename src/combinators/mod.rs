@@ -33,8 +33,8 @@
 //! | [`LengthPrefix`] | Encodes a value after its size. |
 //! | [`Iter`] | Encodes an iterator of encodables as a sequence. |
 #![cfg_attr(
-    any(feature = "std", feature = "alloc"),
-    doc = r#"## std/alloc encodables (requires `std` or `alloc` feature)
+    feature = "alloc",
+    doc = r#"## alloc encodables (requires `alloc` feature)
 
 |         Type|                                                       Description |
 |-------------|-------------------------------------------------------------------|

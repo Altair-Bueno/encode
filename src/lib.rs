@@ -14,6 +14,9 @@
 #![warn(clippy::pedantic)]
 #![cfg_attr(not(feature = "std"), no_std)]
 
+#[cfg(feature = "alloc")]
+extern crate alloc;
+
 pub mod combinators;
 pub mod encoders;
 mod impls;

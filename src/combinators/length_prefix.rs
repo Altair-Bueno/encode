@@ -3,6 +3,7 @@
 /// # Examples
 ///
 /// ```rust
+/// # #[cfg(feature = "alloc")] {
 /// use encode::Encodable;
 /// use encode::combinators::LengthPrefix;
 /// use encode::combinators::FromError;
@@ -11,6 +12,7 @@
 /// let mut buf = Vec::new();
 /// LengthPrefix::<_, u8, TryFromIntError>::new("hello").encode(&mut buf).unwrap();
 /// assert_eq!(&buf, b"\x05hello", "Using a single byte to indicate the length of the string");
+/// # }
 /// ```
 #[doc(alias("length", "prefix", "TLV"))]
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]

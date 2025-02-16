@@ -5,6 +5,7 @@ use core::ops::Deref;
 /// # Examples
 ///
 /// ```rust
+/// # #[cfg(feature = "alloc")] {
 /// use encode::Encodable;
 /// use encode::combinators::Cond;
 /// use std::ffi::CStr;
@@ -19,6 +20,7 @@ use core::ops::Deref;
 ///
 /// Cond::new(c"", non_empty).encode(&mut buf).unwrap();
 /// assert_eq!(&buf, b"", "An empty CStr does not produce any output");
+/// # }
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Cond<E, F> {

@@ -3,6 +3,7 @@
 /// # Example
 ///
 /// ```
+/// # #[cfg(feature = "alloc")] {
 /// use encode::Encodable;
 /// use encode::combinators::Separated;
 ///
@@ -10,6 +11,7 @@
 /// let array = ["hello", "world", "another"];
 /// Separated::new(&array, ", ").encode(&mut buf).unwrap();
 /// assert_eq!(&buf, b"hello, world, another");
+/// # }
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Separated<I, S> {

@@ -10,20 +10,20 @@
 //! - [`SizeEncoder`]: counts the number of bytes written.
 //! - [`&mut [u8]`](slice): writes bytes into a slice, if there is enough space.
 #![cfg_attr(
-    any(feature = "std", feature = "alloc"),
+    feature = "alloc",
     doc = "- [`Vec<u8>`] (`std` or `alloc` feature): writes bytes into a vector that grows if necessary."
 )]
 #![cfg_attr(
     feature = "arrayvec",
     doc = "- [`ArrayVec`](::arrayvec::ArrayVec) (`arrayvec` feature): writes bytes into an ArrayVec, if there is enough space."
 )]
+#[cfg(feature = "alloc")]
+mod alloc;
 #[cfg(feature = "arrayvec")]
 mod arrayvec;
 mod errors;
 mod size;
 mod slices;
-#[cfg(any(feature = "std", feature = "alloc"))]
-mod std_alloc;
 
 pub use errors::InsufficientSpace;
 pub use size::SizeEncoder;
