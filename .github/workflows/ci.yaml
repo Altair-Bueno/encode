@@ -40,7 +40,7 @@ jobs:
 
       - name: cargo build
         run: |
-          cargo b --workspace --all-targets --no-default-features --features ${{ matrix.features }}
+          cargo b --workspace --all-targets --no-default-features --features=${{ matrix.features }}
 
   cargo-fmt:
     name: Cargo fmt
@@ -81,7 +81,7 @@ jobs:
 
       - name: Clippy Check
         run: |
-          cargo clippy --workspace --all-targets --no-default-features --features ${{ matrix.features }} -- -Dwarnings
+          cargo clippy --workspace --all-targets --no-default-features --features=${{ matrix.features }} -- -Dwarnings
 
   cargo-doc:
     name: Cargo doc
@@ -100,7 +100,7 @@ jobs:
 
       - name: Cargo doc test
         run: |
-          cargo doc --workspace --no-default-features --features ${{ matrix.features }}
+          cargo doc --workspace --no-default-features --features=${{ matrix.features }}
 
   check-crate-type:
     uses: ./.github/workflows/crate_type.yaml
@@ -123,7 +123,7 @@ jobs:
 
       - name: Cargo test doc
         run: |
-          cargo test --doc --workspace --no-default-features --features ${{ matrix.features }}
+          cargo test --doc --workspace --no-default-features --features=${{ matrix.features }}
 
   cargo-next-test:
     name: Cargo test
@@ -147,7 +147,7 @@ jobs:
 
       - name: Cargo test
         run: |
-          cargo nextest run --workspace --all-targets --no-default-features --features ${{ matrix.features }} --no-tests=pass
+          cargo nextest run --workspace --all-targets --no-default-features --features=${{ matrix.features }} --no-tests=pass
 
   typos-cli:
     name: typos
