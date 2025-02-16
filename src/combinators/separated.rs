@@ -22,7 +22,7 @@ pub struct Separated<I, S> {
 impl<I, S> Separated<I, S> {
     /// Creates a new [`Separated`] combinator.
     #[inline]
-    pub fn new(encodable_iter: I, separator: S) -> Self {
+    pub const fn new(encodable_iter: I, separator: S) -> Self {
         Self {
             encodable_iter,
             separator,

@@ -43,7 +43,7 @@ impl Flags {
     /// Consumes the [`Flags`] combinator and returns the inner value.
     #[inline]
     #[must_use]
-    pub fn into_inner(self) -> [bool; 8] {
+    pub const fn into_inner(self) -> [bool; 8] {
         self.0
     }
 }

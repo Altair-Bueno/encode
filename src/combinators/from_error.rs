@@ -30,7 +30,7 @@ impl<E, DstError> FromError<E, DstError> {
     /// Creates a new [`FromError`] combinator.
     #[inline]
     #[must_use]
-    pub fn new(encodable: E) -> Self {
+    pub const fn new(encodable: E) -> Self {
         Self {
             encodable,
             error: PhantomData,

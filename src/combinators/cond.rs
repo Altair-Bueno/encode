@@ -33,7 +33,7 @@ impl<E, F> Cond<E, F> {
     /// Creates a new [`Cond`] combinator.
     #[inline]
     #[must_use]
-    pub fn new(encodable: E, condition: F) -> Self
+    pub const fn new(encodable: E, condition: F) -> Self
     where
         F: Fn(&E) -> bool,
     {
