@@ -1,3 +1,4 @@
+use core::borrow::Borrow;
 use core::ops::Deref;
 
 /// Conditionally encodes an encodable.
@@ -31,6 +32,7 @@ pub struct Cond<E, F> {
 impl<E, F> Cond<E, F> {
     /// Creates a new [`Cond`] combinator.
     #[inline]
+    #[must_use]
     pub fn new(encodable: E, condition: F) -> Self
     where
         F: Fn(&E) -> bool,
@@ -40,6 +42,12 @@ impl<E, F> Cond<E, F> {
             condition,
         }
     }
+    /// Consumes the [`Cond`] combinator and returns the inner value.
+    #[inline]
+    #[must_use]
+    pub fn into_inner(self) -> (E, F) {
+        (self.encodable, self.condition)
+    }
 }
 
 impl<E, F> AsRef<E> for Cond<E, F> {
@@ -48,7 +56,12 @@ impl<E, F> AsRef<E> for Cond<E, F> {
         &self.encodable
     }
 }
-
+impl<E, F> Borrow<E> for Cond<E, F> {
+    #[inline]
+    fn borrow(&self) -> &E {
+        &self.encodable
+    }
+}
 impl<E, F> Deref for Cond<E, F> {
     type Target = E;
     #[inline]

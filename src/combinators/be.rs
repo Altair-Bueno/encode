@@ -1,4 +1,6 @@
+use core::borrow::Borrow;
 use core::num::NonZero;
+use core::ops::Deref;
 
 use crate::Encodable;
 use crate::Encoder;
@@ -25,8 +27,36 @@ pub struct BE<E> {
 impl<E> BE<E> {
     /// Creates a new [`BE`] combinator.
     #[inline]
+    #[must_use]
     pub const fn new(num: E) -> Self {
         Self { num }
+    }
+    /// Consumes the [`BE`] combinator and returns the inner value.
+    #[inline]
+    #[must_use]
+    pub fn into_inner(self) -> E {
+        self.num
+    }
+}
+
+impl<E> AsRef<E> for BE<E> {
+    #[inline]
+    fn as_ref(&self) -> &E {
+        &self.num
+    }
+}
+impl<E> Borrow<E> for BE<E> {
+    #[inline]
+    fn borrow(&self) -> &E {
+        &self.num
+    }
+}
+impl<E> Deref for BE<E> {
+    type Target = E;
+
+    #[inline]
+    fn deref(&self) -> &Self::Target {
+        &self.num
     }
 }
 

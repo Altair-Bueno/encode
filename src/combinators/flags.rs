@@ -37,8 +37,14 @@ impl Flags {
     /// Creates a new [`Flags`] combinator.
     #[inline]
     #[must_use]
-    pub fn new(flags: [bool; 8]) -> Self {
+    pub const fn new(flags: [bool; 8]) -> Self {
         Self(flags)
+    }
+    /// Consumes the [`Flags`] combinator and returns the inner value.
+    #[inline]
+    #[must_use]
+    pub fn into_inner(self) -> [bool; 8] {
+        self.0
     }
 }
 

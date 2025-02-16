@@ -29,11 +29,18 @@ pub struct FromError<E, DstError> {
 impl<E, DstError> FromError<E, DstError> {
     /// Creates a new [`FromError`] combinator.
     #[inline]
+    #[must_use]
     pub fn new(encodable: E) -> Self {
         Self {
             encodable,
             error: PhantomData,
         }
+    }
+    /// Consumes the [`FromError`] combinator and returns the inner value.
+    #[inline]
+    #[must_use]
+    pub fn into_inner(self) -> E {
+        self.encodable
     }
 }
 
@@ -107,7 +114,7 @@ impl<E: PartialOrd, DstError> PartialOrd for FromError<E, DstError> {
         self.encodable.partial_cmp(&other.encodable)
     }
 }
-impl Ord for FromError<String, core::num::ParseIntError> {
+impl<E: Ord, DstError> Ord for FromError<E, DstError> {
     fn cmp(&self, other: &Self) -> core::cmp::Ordering {
         self.encodable.cmp(&other.encodable)
     }

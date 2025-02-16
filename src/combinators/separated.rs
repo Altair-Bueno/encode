@@ -28,6 +28,12 @@ impl<I, S> Separated<I, S> {
             separator,
         }
     }
+    /// Consumes the [`Separated`] combinator and returns the inner value.
+    #[inline]
+    #[must_use]
+    pub fn into_inner(self) -> (I, S) {
+        (self.encodable_iter, self.separator)
+    }
 }
 
 impl<EncodableIter, Separator, Encoder> crate::Encodable<Encoder>

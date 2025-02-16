@@ -29,6 +29,7 @@ pub struct LengthPrefix<Encodable, Length, Error> {
 impl<Encodable, Length, Error> LengthPrefix<Encodable, Length, Error> {
     /// Creates a new TLV combinator.
     #[inline]
+    #[must_use]
     pub const fn new(encodable: Encodable) -> Self {
         Self {
             encodable,
@@ -37,6 +38,7 @@ impl<Encodable, Length, Error> LengthPrefix<Encodable, Length, Error> {
     }
     /// Consumes the combinator and returns the inner encodable.
     #[inline]
+    #[must_use]
     pub fn into_inner(self) -> Encodable {
         self.encodable
     }

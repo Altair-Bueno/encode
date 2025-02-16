@@ -1,3 +1,6 @@
+use core::borrow::Borrow;
+use core::ops::Deref;
+
 /// A combinator that encodes an iterator of encodables as a sequence.
 ///
 /// # Example
@@ -25,8 +28,36 @@ pub struct Iter<I> {
 impl<I> Iter<I> {
     /// Creates a new [`Iter`] combinator.
     #[inline]
-    pub fn new(encodable_iter: I) -> Self {
+    #[must_use]
+    pub const fn new(encodable_iter: I) -> Self {
         Self { encodable_iter }
+    }
+    /// Consumes the [`Iter`] combinator and returns the inner value.
+    #[inline]
+    #[must_use]
+    pub fn into_inner(self) -> I {
+        self.encodable_iter
+    }
+}
+
+impl<I> AsRef<I> for Iter<I> {
+    #[inline]
+    fn as_ref(&self) -> &I {
+        &self.encodable_iter
+    }
+}
+impl<I> Borrow<I> for Iter<I> {
+    #[inline]
+    fn borrow(&self) -> &I {
+        &self.encodable_iter
+    }
+}
+impl<I> Deref for Iter<I> {
+    type Target = I;
+
+    #[inline]
+    fn deref(&self) -> &Self::Target {
+        &self.encodable_iter
     }
 }
 
