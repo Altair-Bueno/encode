@@ -1,6 +1,7 @@
 #![doc = include_str!("../README.md")]
 #![forbid(
     missing_docs,
+    missing_debug_implementations,
     unsafe_code,
     clippy::std_instead_of_core,
     clippy::std_instead_of_alloc,
@@ -9,7 +10,11 @@
     clippy::infinite_loop,
     clippy::mem_forget,
     clippy::panic,
-    clippy::cargo
+    clippy::cargo,
+    clippy::missing_const_for_fn,
+    clippy::unwrap_used,
+    clippy::tabs_in_doc_comments,
+    clippy::perf
 )]
 #![warn(clippy::pedantic)]
 #![cfg_attr(not(feature = "std"), no_std)]
