@@ -1,3 +1,8 @@
+use core::borrow::Borrow;
+use core::fmt::Debug;
+use core::marker::PhantomData;
+use core::ops::Deref;
+
 /// Encodes a length prefixed value ([TLV](https://en.wikipedia.org/wiki/Type–length–value)).
 ///
 /// # Examples
@@ -15,11 +20,10 @@
 /// # }
 /// ```
 #[doc(alias("length", "prefix", "TLV"))]
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 #[repr(transparent)]
 pub struct LengthPrefix<Encodable, Length, Error> {
     encodable: Encodable,
-    phantom: core::marker::PhantomData<(Length, Error)>,
+    phantom: PhantomData<(Length, Error)>,
 }
 
 impl<Encodable, Length, Error> LengthPrefix<Encodable, Length, Error> {
@@ -28,8 +32,39 @@ impl<Encodable, Length, Error> LengthPrefix<Encodable, Length, Error> {
     pub const fn new(encodable: Encodable) -> Self {
         Self {
             encodable,
-            phantom: core::marker::PhantomData,
+            phantom: PhantomData,
         }
+    }
+    /// Consumes the combinator and returns the inner encodable.
+    #[inline]
+    pub fn into_inner(self) -> Encodable {
+        self.encodable
+    }
+}
+
+impl<Encodable, Length, Error> From<Encodable> for LengthPrefix<Encodable, Length, Error> {
+    fn from(value: Encodable) -> Self {
+        Self::new(value)
+    }
+}
+
+impl<Encodable, Length, Error> AsRef<Encodable> for LengthPrefix<Encodable, Length, Error> {
+    #[inline]
+    fn as_ref(&self) -> &Encodable {
+        &self.encodable
+    }
+}
+
+impl<Encodable, Length, Error> Deref for LengthPrefix<Encodable, Length, Error> {
+    type Target = Encodable;
+    fn deref(&self) -> &Self::Target {
+        self.as_ref()
+    }
+}
+
+impl<Encodable, Length, Error> Borrow<Encodable> for LengthPrefix<Encodable, Length, Error> {
+    fn borrow(&self) -> &Encodable {
+        &self.encodable
     }
 }
 
@@ -55,5 +90,66 @@ where
         len_encoder.encode(encoder)?;
         self.encodable.encode(encoder)?;
         Ok(())
+    }
+}
+
+// Manual trait implementations because the derive macro does not support
+// phantom data fields.
+impl<Encodable, Length, Error> Debug for LengthPrefix<Encodable, Length, Error>
+where
+    Encodable: Debug,
+{
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        f.debug_struct("LengthPrefix")
+            .field("encodable", &self.encodable)
+            .finish()
+    }
+}
+impl<Encodable, Length, Error> Clone for LengthPrefix<Encodable, Length, Error>
+where
+    Encodable: Clone,
+{
+    fn clone(&self) -> Self {
+        Self {
+            encodable: self.encodable.clone(),
+            phantom: PhantomData,
+        }
+    }
+}
+impl<Encodable, Length, Error> Copy for LengthPrefix<Encodable, Length, Error> where Encodable: Copy {}
+impl<Encodable, Length, Error> Default for LengthPrefix<Encodable, Length, Error>
+where
+    Encodable: Default,
+{
+    fn default() -> Self {
+        Self {
+            encodable: Default::default(),
+            phantom: PhantomData,
+        }
+    }
+}
+impl<Encodable, Length, Error> PartialEq for LengthPrefix<Encodable, Length, Error>
+where
+    Encodable: PartialEq,
+{
+    fn eq(&self, other: &Self) -> bool {
+        self.encodable == other.encodable && self.phantom == other.phantom
+    }
+}
+impl<Encodable, Length, Error> Eq for LengthPrefix<Encodable, Length, Error> where Encodable: Eq {}
+impl<Encodable, Length, Error> PartialOrd for LengthPrefix<Encodable, Length, Error>
+where
+    Encodable: PartialOrd,
+{
+    fn partial_cmp(&self, other: &Self) -> Option<core::cmp::Ordering> {
+        self.encodable.partial_cmp(&other.encodable)
+    }
+}
+impl<Encodable, Length, Error> Ord for LengthPrefix<Encodable, Length, Error>
+where
+    Encodable: Ord,
+{
+    fn cmp(&self, other: &Self) -> core::cmp::Ordering {
+        self.encodable.cmp(&other.encodable)
     }
 }

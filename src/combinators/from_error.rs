@@ -1,3 +1,6 @@
+use core::borrow::Borrow;
+use core::fmt::Debug;
+use core::marker::PhantomData;
 use core::ops::Deref;
 
 /// A combinator that transforms the error type of an encodable.
@@ -17,11 +20,10 @@ use core::ops::Deref;
 /// assert_eq!(&buf, b"hello");
 /// # }
 /// ```
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 #[repr(transparent)]
 pub struct FromError<E, DstError> {
     encodable: E,
-    error: core::marker::PhantomData<DstError>,
+    error: PhantomData<DstError>,
 }
 
 impl<E, DstError> FromError<E, DstError> {
@@ -30,7 +32,7 @@ impl<E, DstError> FromError<E, DstError> {
     pub fn new(encodable: E) -> Self {
         Self {
             encodable,
-            error: core::marker::PhantomData,
+            error: PhantomData,
         }
     }
 }
@@ -47,6 +49,11 @@ impl<E, DstError> AsRef<E> for FromError<E, DstError> {
         &self.encodable
     }
 }
+impl<E, DstError> Borrow<E> for FromError<E, DstError> {
+    fn borrow(&self) -> &E {
+        &self.encodable
+    }
+}
 
 impl<Encodable, Encoder, DstError> crate::Encodable<Encoder> for FromError<Encodable, DstError>
 where
@@ -60,5 +67,48 @@ where
     fn encode(&self, encoder: &mut Encoder) -> Result<(), Self::Error> {
         self.encodable.encode(encoder)?;
         Ok(())
+    }
+}
+
+// Manual trait implementations because the derive macro does not support
+// phantom data fields.
+impl<E: Debug, DstError> Debug for FromError<E, DstError> {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        f.debug_struct("FromError")
+            .field("encodable", &self.encodable)
+            .finish()
+    }
+}
+impl<E: Clone, DstError> Clone for FromError<E, DstError> {
+    fn clone(&self) -> Self {
+        Self {
+            encodable: self.encodable.clone(),
+            error: PhantomData,
+        }
+    }
+}
+impl<E: Copy, DstError> Copy for FromError<E, DstError> {}
+impl<E: Default, DstError> Default for FromError<E, DstError> {
+    fn default() -> Self {
+        Self {
+            encodable: Default::default(),
+            error: PhantomData,
+        }
+    }
+}
+impl<E: PartialEq, DstError> PartialEq for FromError<E, DstError> {
+    fn eq(&self, other: &Self) -> bool {
+        self.encodable == other.encodable && self.error == other.error
+    }
+}
+impl<E: Eq, DstError> Eq for FromError<E, DstError> {}
+impl<E: PartialOrd, DstError> PartialOrd for FromError<E, DstError> {
+    fn partial_cmp(&self, other: &Self) -> Option<core::cmp::Ordering> {
+        self.encodable.partial_cmp(&other.encodable)
+    }
+}
+impl Ord for FromError<String, core::num::ParseIntError> {
+    fn cmp(&self, other: &Self) -> core::cmp::Ordering {
+        self.encodable.cmp(&other.encodable)
     }
 }
