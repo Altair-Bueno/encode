@@ -19,49 +19,7 @@ jobs:
         uses: actions/checkout@v2
       - name: Get crate information
         id: crate-info
-        shell: python3 {0}
-        run: |
-          import itertools
-          import tomllib
-          import json
-          from os import environ
-
-          def powerset(features):
-            return itertools.chain.from_iterable(
-                itertools.combinations(features, r)
-                for r in range(len(features)+1)
-            )
-
-          def flatten_dependencies(enables, tree):
-            res = []
-            for enable in enables:
-                dependencies = tree.get(enable)
-                if dependencies is None:
-                    continue
-                elif dependencies != []:
-                    res += flatten_dependencies(dependencies, tree)
-                res.append(enable)
-            return res
-
-          def is_disjoint_combination(enables, tree):
-            l = flatten_dependencies(enables, tree)
-            return len(l) == len(set(l))
-
-          with open("Cargo.toml", "rb") as f:
-            data = tomllib.load(f)
-
-          msrv = data['package']['rust-version']
-          features = list(data["features"].keys())
-          powerset = [
-            ','.join(combination)
-            for combination in powerset(features)
-            if is_disjoint_combination(combination, data["features"])
-          ]
-
-          with open(environ["GITHUB_OUTPUT"], "wt") as f:
-            f.write(f"powerset={json.dumps(powerset)}\n")
-            f.write(f"features={json.dumps(features)}\n")
-            f.write(f"msrv={msrv}\n")
+        run: python3 .github/define_matrix.py
 
   rust-checks:
     runs-on: ubuntu-latest
