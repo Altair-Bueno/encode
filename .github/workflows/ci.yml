@@ -110,8 +110,6 @@ jobs:
         with:
           tool: cargo-tarpaulin
       - name: Gather coverage
-        run: cargo tarpaulin --output-dir coverage --out lcov --all-features
-      - name: Gather doc coverage
         run: cargo tarpaulin --output-dir coverage --out lcov --all-features --doc --all-targets
       - name: Publish to Codecov
         uses: codecov/codecov-action@v3
