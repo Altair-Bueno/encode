@@ -34,7 +34,7 @@
 //! | [`Iter`] | Encodes an iterator of encodables as a sequence. |
 #![cfg_attr(
     feature = "alloc",
-    doc = r#"## alloc encodables (requires `alloc` feature)
+    doc = r"## alloc encodables (requires `alloc` feature)
 
 |         Type|                                                       Description |
 |-------------|-------------------------------------------------------------------|
@@ -42,7 +42,7 @@
 | [`String`]  | Encodes a string as a UTF-8 byte sequence                         |
 | [`CString`](std::ffi::CString) | Encodes a string as a byte sequence with a null terminator (`\0`) |
 | [`Box`]     | Encodes a boxed value                                             |
-"#
+"
 )]
 
 mod be;
