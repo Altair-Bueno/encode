@@ -1,7 +1,7 @@
 # Encode, a Rust library for building encoders and serializers
 
 [![LICENSE](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![CI](https://github.com/Altair-Bueno/encode/actions/workflows/ci.yaml/badge.svg)](https://github.com/Altair-Bueno/encode/actions/workflows/ci.yaml)
+[![CI](https://github.com/Altair-Bueno/encode/actions/workflows/ci.yml/badge.svg)](https://github.com/Altair-Bueno/encode/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/Altair-Bueno/encode/graph/badge.svg?token=Q89UGZC3RI)](https://codecov.io/gh/Altair-Bueno/encode)
 [![Crates.io Version](https://img.shields.io/crates/v/encode.svg)](https://crates.io/crates/encode)
 
