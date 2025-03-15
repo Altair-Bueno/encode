@@ -90,3 +90,33 @@ jobs:
         run: cargo clippy --features '${{ matrix.features }}'
       - name: Check formatting
         run: cargo fmt --all -- --check
+  coverage:
+    name: Coverage
+    needs:
+      - define-matrix
+      - rust-checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: ${{ needs.define-matrix.outputs.msrv }}
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-${{ needs.define-matrix.outputs.msrv }}
+      - name: Install cargo-tarpaulin
+        run: cargo install cargo-tarpaulin
+      - name: Gather coverage
+        run: cargo tarpaulin --output-dir coverage --out lcov --all-features
+      - name: Publish to Codecov
+        uses: codecov/codecov-action@v3
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

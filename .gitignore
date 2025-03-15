@@ -1,5 +1,6 @@
 .vscode/
 .zed/
 target/
+coverage/
 
 *.lock
