@@ -39,6 +39,7 @@ crate.
 - `std`: Enables the use of the standard library.
 - `alloc`: Enables the use of the `alloc` crate.
 - `arrayvec`: Implements [`Encodable`] for [`arrayvec::ArrayVec`].
+- `bytes`: Implements [`Encodable`] for [`bytes::BytesMut`].
 
 ## FAQs
 
