@@ -8,6 +8,43 @@ on:
       - "*"
 
 jobs:
+  typos-cli:
+    name: typos
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch Repository
+        uses: actions/checkout@v4
+      - name: Install Typos
+        uses: taiki-e/install-action@v2
+        with:
+          tool: typos-cli
+      - name: run typos
+        run: typos
+
+  taplo-toml-fmt:
+    name: taplo fmt
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch Repository
+        uses: actions/checkout@v4
+      - name: Install Taplo
+        uses: taiki-e/install-action@v2
+        with:
+          tool: taplo-cli
+      - name: Run Taplo
+        id: taplo
+        run: taplo fmt --check --diff
+
+  markdownlint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch Repository
+        uses: actions/checkout@v4
+      - name: markdownlint-cli2-action
+        uses: DavidAnson/markdownlint-cli2-action@v19
+        with:
+          globs: "**/*.md"
+
   define-matrix:
     runs-on: ubuntu-latest
     outputs:
