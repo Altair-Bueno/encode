@@ -57,7 +57,7 @@ jobs:
           - stable
           - beta
           - nightly
-          - ${{ fromJSON(needs.define-matrix.outputs.msrv) }}
+          - ${{ needs.define-matrix.outputs.msrv }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
