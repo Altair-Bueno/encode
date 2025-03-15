@@ -17,10 +17,16 @@
     feature = "arrayvec",
     doc = "- [`ArrayVec`](::arrayvec::ArrayVec) (`arrayvec` feature): writes bytes into an ArrayVec, if there is enough space."
 )]
+#![cfg_attr(
+    feature = "bytes",
+    doc = "- [`BufMut`](::bytes::BufMut) (`bytes` feature): writes bytes into an BufMut. Note that encoding will be more efficient if the BufMut is already pre-allocated."
+)]
 #[cfg(feature = "alloc")]
 mod alloc;
 #[cfg(feature = "arrayvec")]
 mod arrayvec;
+#[cfg(feature = "bytes")]
+mod bytes;
 mod errors;
 mod size;
 mod slices;
