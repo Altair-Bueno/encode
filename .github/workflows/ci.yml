@@ -28,9 +28,24 @@ jobs:
 
           def powerset(features):
             return itertools.chain.from_iterable(
-              itertools.combinations(features, r)
-              for r in range(len(features)+1)
+                itertools.combinations(features, r)
+                for r in range(len(features)+1)
             )
+
+          def flatten_dependencies(enables, tree):
+            res = []
+            for enable in enables:
+                dependencies = tree.get(enable)
+                if dependencies is None:
+                    continue
+                elif dependencies != []:
+                    res += flatten_dependencies(dependencies, tree)
+                res.append(enable)
+            return res
+
+          def is_disjoint_combination(enables, tree):
+            l = flatten_dependencies(enables, tree)
+            return len(l) == len(set(l))
 
           with open("Cargo.toml", "rb") as f:
             data = tomllib.load(f)
@@ -40,6 +55,7 @@ jobs:
           powerset = [
             ','.join(combination)
             for combination in powerset(features)
+            if is_disjoint_combination(combination, data["features"])
           ]
 
           with open(environ["GITHUB_OUTPUT"], "wt") as f:
