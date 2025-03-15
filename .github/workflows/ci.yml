@@ -71,8 +71,6 @@ jobs:
         features: ${{ fromJSON(needs.define-matrix.outputs.powerset) }}
         toolchain:
           - stable
-          - beta
-          - nightly
           - ${{ needs.define-matrix.outputs.msrv }}
     steps:
       - name: Checkout code
