@@ -32,7 +32,7 @@ jobs:
             data = tomllib.load(f)
 
           msrv = data['package']['rust-version']
-          features = data["features"].keys()
+          features = list(data["features"].keys())
           powerset = [
             ','.join(combination)
             for combination in powerset(features)
