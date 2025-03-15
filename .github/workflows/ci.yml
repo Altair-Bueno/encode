@@ -85,7 +85,9 @@ jobs:
             target/
           key: ${{ runner.os }}-cargo-${{ matrix.toolchain }}
       - name: Run tests
-        run: cargo test --features '${{ matrix.features }}'
+        run: cargo test --features '${{ matrix.features }}' --all-targets
+      - name: Run doc tests
+        run: cargo test --features '${{ matrix.features }}' --doc
       - name: Run linter
         run: cargo clippy --features '${{ matrix.features }}'
       - name: Check formatting
@@ -111,11 +113,13 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
             target/
-          key: ${{ runner.os }}-cargo-${{ needs.define-matrix.outputs.msrv }}
+          key: ${{ runner.os }}-cargo-${{ needs.define-matrix.outputs.msrv }}-coverage
       - name: Install cargo-tarpaulin
         run: cargo install cargo-tarpaulin
       - name: Gather coverage
         run: cargo tarpaulin --output-dir coverage --out lcov --all-features
+      - name: Gather doc coverage
+        run: cargo tarpaulin --output-dir coverage --out lcov --all-features --doc --all-targets
       - name: Publish to Codecov
         uses: codecov/codecov-action@v3
         env:
