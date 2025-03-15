@@ -34,7 +34,7 @@ jobs:
 
   # Create a PR with the new versions and changelog, preparing the next release.
   release-plz-pr:
-    if: ${{ github.repository_owner == 'YOUR_ORG' }}
+    if: ${{ github.repository_owner == 'Altair-Bueno' }}
     name: Release-plz PR
     runs-on: ubuntu-latest
     permissions:
