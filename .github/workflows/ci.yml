@@ -15,7 +15,7 @@ jobs:
         uses: actions/checkout@v2
       - name: Get crate information
         id: crate-info
-        shell: python3
+        shell: python3 {0}
         run: |
           import itertools
           import tomllib
