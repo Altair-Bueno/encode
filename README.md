@@ -2,6 +2,7 @@
 
 [![LICENSE](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![CI](https://github.com/Altair-Bueno/encode/actions/workflows/ci.yaml/badge.svg)](https://github.com/Altair-Bueno/encode/actions/workflows/ci.yaml)
+[![codecov](https://codecov.io/gh/Altair-Bueno/encode/graph/badge.svg?token=Q89UGZC3RI)](https://codecov.io/gh/Altair-Bueno/encode)
 [![Crates.io Version](https://img.shields.io/crates/v/encode.svg)](https://crates.io/crates/encode)
 
 > Encoders/serializers made easy.
