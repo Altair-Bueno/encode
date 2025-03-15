@@ -22,7 +22,7 @@ jobs:
       - id: define-features
         name: Define features
         run: |
-          echo 'features=["", "default", "alloc", "arrayvec", "std,arrayvec", "alloc,arrayvec"]' >> "$GITHUB_OUTPUT"
+          echo 'features=["", "default", "alloc", "arrayvec", "bytes", "default,arrayvec,bytes"]' >> "$GITHUB_OUTPUT"
   cargo-build:
     name: Cargo Build
     runs-on: ubuntu-latest
