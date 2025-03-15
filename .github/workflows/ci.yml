@@ -1,0 +1,92 @@
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - "*"
+  push:
+    branches:
+      - "*"
+
+jobs:
+  typos-cli:
+    name: typos
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch Repository
+        uses: actions/checkout@v4
+      - name: Install Typos
+        uses: taiki-e/install-action@v2
+        with:
+          tool: typos-cli
+      - name: run typos
+        run: typos
+
+  taplo-toml-fmt:
+    name: taplo fmt
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch Repository
+        uses: actions/checkout@v4
+      - name: Install Taplo
+        uses: taiki-e/install-action@v2
+        with:
+          tool: taplo-cli
+      - name: Run Taplo
+        id: taplo
+        run: taplo fmt --check --diff
+
+  markdownlint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch Repository
+        uses: actions/checkout@v4
+      - name: markdownlint-cli2-action
+        uses: DavidAnson/markdownlint-cli2-action@v19
+        with:
+          globs: "**/*.md"
+
+  define-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      powerset: ${{ steps.crate-info.outputs.powerset }}
+      features: ${{ steps.crate-info.outputs.features }}
+      msrv: ${{ steps.crate-info.outputs.msrv }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Get crate information
+        id: crate-info
+        run: python3 .github/define_matrix.py
+
+  rust-checks:
+    runs-on: ubuntu-latest
+    needs: define-matrix
+    strategy:
+      matrix:
+        features: ${{ fromJSON(needs.define-matrix.outputs.powerset) }}
+        toolchain:
+          - stable
+          - ${{ needs.define-matrix.outputs.msrv }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: ${{ matrix.toolchain }}
+          components: rustfmt,clippy
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-${{ matrix.toolchain }}
+      - name: Run tests
+        run: cargo test --features '${{ matrix.features }}'
+      - name: Run linter
+        run: cargo clippy --features '${{ matrix.features }}'
+      - name: Check formatting
+        run: cargo fmt --all -- --check
