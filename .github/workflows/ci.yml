@@ -1,0 +1,79 @@
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - "*"
+
+jobs:
+  define-matrix:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Get crate information
+        id: crate-info
+        shell: python3
+        run: |
+          import itertools
+          import tomllib
+          import json
+          from os import environ
+
+          def powerset(features):
+            return itertools.chain.from_iterable(
+              itertools.combinations(features, r)
+              for r in range(len(features)+1)
+            )
+
+          with open("Cargo.toml", "rb") as f:
+            data = tomllib.load(f)
+
+          msrv = data['package']['rust-version']
+          features = data["features"].keys()
+          powerset = [
+            ','.join(combination)
+            for combination in powerset(features)
+          ]
+
+          with open(environ["GITHUB_OUTPUT"], "wt") as f:
+            f.write(f"powerset={json.dumps(powerset)}\n")
+            f.write(f"features={json.dumps(features)}\n")
+            f.write(f"msrv={msrv}\n")
+
+  rust-checks:
+    runs-on: ubuntu-latest
+    needs: define-matrix
+    strategy:
+      matrix:
+        features: ${{ fromJSON(needs.define-matrix.outputs.crate-info.powerset) }}
+        toolchain:
+          - stable
+          - beta
+          - nightly
+          - ${{ fromJSON(needs.define-matrix.outputs.crate-info.msrv) }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: ${{ matrix.toolchain }}
+          components: rustfmt,clippy
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/
+          key: ${{ runner.os }}-cargo-${{ matrix.toolchain }}
+      - name: Run tests
+        run: cargo test --features '${{ matrix.features }}'
+      - name: Run linter
+        run: cargo clippy --features '${{ matrix.features }}'
+      - name: Check formatting
+        run: cargo fmt --all -- --check
