@@ -12,7 +12,6 @@
     clippy::panic,
     clippy::cargo,
     clippy::missing_const_for_fn,
-    clippy::unwrap_used,
     clippy::tabs_in_doc_comments,
     clippy::perf
 )]
