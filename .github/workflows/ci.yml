@@ -53,7 +53,7 @@ jobs:
       msrv: ${{ steps.crate-info.outputs.msrv }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Get crate information
         id: crate-info
         run: python3 .github/define_matrix.py
@@ -69,7 +69,7 @@ jobs:
           - ${{ needs.define-matrix.outputs.msrv }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
@@ -112,6 +112,6 @@ jobs:
       - name: Gather coverage
         run: cargo tarpaulin --output-dir coverage --out lcov --all-features --doc --all-targets
       - name: Publish to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
