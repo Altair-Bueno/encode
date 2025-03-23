@@ -1,14 +1,14 @@
 use crate::Encodable;
 use crate::Encoder;
 #[cfg(feature = "alloc")]
-use alloc::{borrow::Cow, boxed::Box, string::String, vec::Vec};
+use alloc::{borrow::Cow, boxed::Box, ffi::CString, ffi::CString, string::String, vec::Vec};
 
 impl<E: Encoder> Encodable<E> for Vec<u8> {
     type Error = E::Error;
 
     #[inline]
     fn encode(&self, encoder: &mut E) -> Result<(), Self::Error> {
-        encoder.put_slice(self.as_slice())
+        self.as_slice().encode(encoder)
     }
 }
 
@@ -38,7 +38,16 @@ impl<E: Encoder> Encodable<E> for String {
 
     #[inline]
     fn encode(&self, encoder: &mut E) -> Result<(), Self::Error> {
-        encoder.put_slice(self.as_bytes())
+        self.as_str().encode(encoder)
+    }
+}
+
+impl<E: Encoder> Encodable<E> for CString {
+    type Error = E::Error;
+
+    #[inline]
+    fn encode(&self, encoder: &mut E) -> Result<(), Self::Error> {
+        self.as_c_str().encode(encoder)
     }
 }
 
@@ -69,6 +78,12 @@ mod test {
     #[test]
     fn assert_that_strings_can_be_encoded() {
         let encodable = String::from("hello");
+        encodable.encode(&mut ()).unwrap();
+    }
+
+    #[test]
+    fn assert_that_cstrings_can_be_encoded() {
+        let encodable = CString::from(c"hello");
         encodable.encode(&mut ()).unwrap();
     }
 }
