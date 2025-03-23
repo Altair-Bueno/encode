@@ -48,22 +48,22 @@ jobs:
   define-matrix:
     runs-on: ubuntu-latest
     outputs:
-      powerset: ${{ steps.crate-info.outputs.powerset }}
-      features: ${{ steps.crate-info.outputs.features }}
-      msrv: ${{ steps.crate-info.outputs.msrv }}
+      powerset: ${{ fromJSON(steps.crate-info.outputs.output).powerset }}
+      features: ${{ fromJSON(steps.crate-info.outputs.output).features }}
+      msrv: ${{ fromJSON(steps.crate-info.outputs.output).msrv }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Get crate information
         id: crate-info
-        run: python3 .github/define_matrix.py
+        run: printf "output=%s" "$(python3 .github/define_matrix.py)" >> "$GITHUB_OUTPUT"
 
   rust-checks:
     runs-on: ubuntu-latest
     needs: define-matrix
     strategy:
       matrix:
-        features: ${{ fromJSON(needs.define-matrix.outputs.powerset) }}
+        features: ${{ needs.define-matrix.outputs.powerset }}
         toolchain:
           - stable
           - ${{ needs.define-matrix.outputs.msrv }}
@@ -84,18 +84,17 @@ jobs:
             ~/.cargo/git/db/
             target/
           key: ${{ runner.os }}-cargo-${{ matrix.toolchain }}
-      - name: Run tests
-        run: cargo test --features '${{ matrix.features }}' --all-targets
-      - name: Run doc tests
-        run: cargo test --features '${{ matrix.features }}' --doc
-      - name: Run linter
-        run: cargo clippy --features '${{ matrix.features }}'
       - name: Check formatting
         run: cargo fmt --all -- --check
+      - name: Run tests
+        run: cargo test --no-default-features --features '${{ matrix.features }}' --all-targets
+      - name: Run doc tests
+        run: cargo test --no-default-features --features '${{ matrix.features }}' --doc
+      - name: Run linter
+        run: cargo clippy --no-default-features --features '${{ matrix.features }}'
   coverage:
     name: Coverage
     needs:
-      - define-matrix
       - rust-checks
     runs-on: ubuntu-latest
     steps:
