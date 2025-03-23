@@ -55,3 +55,37 @@ where
         T::encode(self, encoder)
     }
 }
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    #[test]
+    fn assert_that_chars_can_be_encoded() {
+        let encodable = 'a';
+        encodable.encode(&mut ()).unwrap();
+    }
+
+    #[test]
+    fn assert_that_bytes_can_be_encoded() {
+        let encodable = 42u8;
+        encodable.encode(&mut ()).unwrap();
+    }
+
+    #[test]
+    fn assert_that_signed_bytes_can_be_encoded() {
+        let encodable = 42i8;
+        encodable.encode(&mut ()).unwrap();
+    }
+
+    #[test]
+    fn assert_that_bools_can_be_encoded() {
+        let encodable = true;
+        encodable.encode(&mut ()).unwrap();
+    }
+
+    #[test]
+    fn assert_that_references_to_encodables_can_be_encoded() {
+        let encodable = &42u8;
+        encodable.encode(&mut ()).unwrap();
+    }
+}

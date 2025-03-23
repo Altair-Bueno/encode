@@ -61,3 +61,19 @@ impl<E: Encoder> Encodable<E> for () {
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    #[test]
+    fn assert_that_tuples_can_be_encoded() {
+        let encodable = ("hello", "world");
+        encodable.encode(&mut ()).unwrap();
+    }
+
+    #[test]
+    fn assert_that_unit_can_be_encoded() {
+        let encodable = ();
+        encodable.encode(&mut ()).unwrap();
+    }
+}
