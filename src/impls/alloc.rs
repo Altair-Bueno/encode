@@ -1,7 +1,7 @@
 use crate::Encodable;
 use crate::Encoder;
 #[cfg(feature = "alloc")]
-use alloc::{borrow::Cow, boxed::Box, ffi::CString, ffi::CString, string::String, vec::Vec};
+use alloc::{borrow::Cow, boxed::Box, ffi::CString, string::String, vec::Vec};
 
 impl<E: Encoder> Encodable<E> for Vec<u8> {
     type Error = E::Error;
