@@ -48,9 +48,7 @@ jobs:
   define-matrix:
     runs-on: ubuntu-latest
     outputs:
-      powerset: ${{ fromJSON(steps.crate-info.outputs.output).powerset }}
-      features: ${{ fromJSON(steps.crate-info.outputs.output).features }}
-      msrv: ${{ fromJSON(steps.crate-info.outputs.output).msrv }}
+      output: ${{ steps.crate-info.outputs.output }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -65,10 +63,10 @@ jobs:
     needs: define-matrix
     strategy:
       matrix:
-        features: ${{ needs.define-matrix.outputs.powerset }}
+        features: ${{ fromJSON(needs.define-matrix.outputs.output).powerset }}
         toolchain:
           - stable
-          - ${{ needs.define-matrix.outputs.msrv }}
+          - ${{ fromJSON(needs.define-matrix.outputs.output).msrv }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -105,7 +103,7 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
         with:
-          toolchain: ${{ needs.define-matrix.outputs.msrv }}
+          toolchain: stable
       - name: Install cargo-tarpaulin
         uses: taiki-e/install-action@v2
         with:
