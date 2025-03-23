@@ -56,7 +56,9 @@ jobs:
         uses: actions/checkout@v2
       - name: Get crate information
         id: crate-info
-        run: printf "output=%s" "$(python3 .github/define_matrix.py)" >> "$GITHUB_OUTPUT"
+        run: |
+          echo -n 'output=' >> "$GITHUB_OUTPUT"
+          python3 .github/define_matrix.py >> "$GITHUB_OUTPUT"
 
   rust-checks:
     runs-on: ubuntu-latest
