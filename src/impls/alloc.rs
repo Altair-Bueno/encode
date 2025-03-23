@@ -45,6 +45,8 @@ impl<E: Encoder> Encodable<E> for String {
 #[cfg(test)]
 mod test {
     use super::*;
+    #[cfg(feature = "alloc")]
+    use alloc::vec;
 
     #[test]
     fn assert_that_vecs_can_be_encoded() {
