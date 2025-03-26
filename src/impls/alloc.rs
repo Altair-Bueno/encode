@@ -63,8 +63,14 @@ mod test {
     use alloc::vec;
 
     #[test]
-    fn assert_that_cow_slice_can_be_encoded() {
-        let cow: Cow<'_, [u8]> = Cow::Borrowed(&[][..]);
+    fn assert_that_boxes_can_be_encoded() {
+        let encodable = Box::new(5u8);
+        encodable.encode(&mut ()).unwrap();
+    }
+
+    #[test]
+    fn assert_that_cows_can_be_encoded() {
+        let cow = Cow::Borrowed("hello");
         // Explicit fully qualified call because otherwise autoref could just encode `&[u8]`.
         <Cow<'_, _> as Encodable<()>>::encode(&cow, &mut ()).unwrap();
     }
