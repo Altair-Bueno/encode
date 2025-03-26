@@ -22,7 +22,7 @@ impl<E: Encoder, T: Encodable<E>> Encodable<E> for Box<T> {
 
 impl<E: Encoder, T: Encodable<E>> Encodable<E> for Cow<'_, T>
 where
-    T: Clone + Encodable<E>,
+    T: ToOwned + Encodable<E> + ?Sized,
 {
     type Error = T::Error;
 
@@ -38,5 +38,19 @@ impl<E: Encoder> Encodable<E> for String {
     #[inline]
     fn encode(&self, encoder: &mut E) -> Result<(), Self::Error> {
         encoder.put_slice(self.as_bytes())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use alloc::borrow::Cow;
+
+    use crate::Encodable;
+
+    #[test]
+    fn assert_that_cow_slice_can_be_encoded() {
+        let cow: Cow<'_, [u8]> = Cow::Borrowed(&[][..]);
+        // Explicit fully qualified call because otherwise autoref could just encode `&[u8]`.
+        <Cow<'_, _> as Encodable<()>>::encode(&cow, &mut ()).unwrap();
     }
 }
