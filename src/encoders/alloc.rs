@@ -1,5 +1,4 @@
 use crate::Encoder;
-#[cfg(feature = "alloc")]
 use alloc::vec::Vec;
 
 impl Encoder for Vec<u8> {
