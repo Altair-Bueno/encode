@@ -20,9 +20,10 @@ impl<E: Encoder, T: Encodable<E>> Encodable<E> for Box<T> {
     }
 }
 
-impl<E: Encoder, T: Encodable<E>> Encodable<E> for Cow<'_, T>
+impl<E, T> Encodable<E> for Cow<'_, T>
 where
     T: ToOwned + Encodable<E> + ?Sized,
+    E: Encoder,
 {
     type Error = T::Error;
 
