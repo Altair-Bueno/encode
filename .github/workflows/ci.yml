@@ -5,8 +5,8 @@ on:
       - "*"
   push:
     branches:
-      - "*"
-
+      - "master"
+      - "main"
 jobs:
   typos-cli:
     name: typos
