@@ -1,6 +1,6 @@
 use crate::Encodable;
 use crate::Encoder;
-use alloc::{borrow::Cow, boxed::Box, string::String, vec::Vec};
+use alloc::{borrow::Cow, borrow::ToOwned, boxed::Box, string::String, vec::Vec};
 
 impl<E: Encoder> Encodable<E> for Vec<u8> {
     type Error = E::Error;
