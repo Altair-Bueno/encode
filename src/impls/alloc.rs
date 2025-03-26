@@ -1,7 +1,12 @@
 use crate::Encodable;
 use crate::Encoder;
-#[cfg(feature = "alloc")]
-use alloc::{borrow::Cow, boxed::Box, ffi::CString, string::String, vec::Vec};
+use alloc::{
+    borrow::{Cow, ToOwned},
+    boxed::Box,
+    ffi::CString,
+    string::String,
+    vec::Vec,
+};
 
 impl<E: Encoder> Encodable<E> for Vec<u8> {
     type Error = E::Error;
@@ -21,9 +26,10 @@ impl<E: Encoder, T: Encodable<E>> Encodable<E> for Box<T> {
     }
 }
 
-impl<E: Encoder, T: Encodable<E>> Encodable<E> for Cow<'_, T>
+impl<E, T> Encodable<E> for Cow<'_, T>
 where
-    T: Clone + Encodable<E>,
+    T: ToOwned + Encodable<E> + ?Sized,
+    E: Encoder,
 {
     type Error = T::Error;
 
@@ -54,8 +60,14 @@ impl<E: Encoder> Encodable<E> for CString {
 #[cfg(test)]
 mod test {
     use super::*;
-    #[cfg(feature = "alloc")]
     use alloc::vec;
+
+    #[test]
+    fn assert_that_cow_slice_can_be_encoded() {
+        let cow: Cow<'_, [u8]> = Cow::Borrowed(&[][..]);
+        // Explicit fully qualified call because otherwise autoref could just encode `&[u8]`.
+        <Cow<'_, _> as Encodable<()>>::encode(&cow, &mut ()).unwrap();
+    }
 
     #[test]
     fn assert_that_vecs_can_be_encoded() {
@@ -66,12 +78,6 @@ mod test {
     #[test]
     fn assert_that_boxes_can_be_encoded() {
         let encodable = Box::new(5u8);
-        encodable.encode(&mut ()).unwrap();
-    }
-
-    #[test]
-    fn assert_that_cows_can_be_encoded() {
-        let encodable = Cow::Borrowed("hello");
         encodable.encode(&mut ()).unwrap();
     }
 
