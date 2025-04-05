@@ -54,7 +54,7 @@ impl<E: Encoder> Encodable<E> for CString {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::Encodable;
+    use alloc::vec;
 
     #[test]
     fn assert_that_boxes_can_be_encoded() {
