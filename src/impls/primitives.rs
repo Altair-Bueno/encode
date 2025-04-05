@@ -7,8 +7,7 @@ impl<E: Encoder> Encodable<E> for char {
     #[inline]
     fn encode(&self, encoder: &mut E) -> Result<(), Self::Error> {
         let mut buf = [0; 4];
-        let s = self.encode_utf8(&mut buf);
-        encoder.put_slice(s.as_bytes())
+        self.encode_utf8(&mut buf).encode(encoder)
     }
 }
 
