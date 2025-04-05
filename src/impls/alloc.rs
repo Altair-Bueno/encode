@@ -1,12 +1,6 @@
 use crate::Encodable;
 use crate::Encoder;
-use alloc::{
-    borrow::{Cow, ToOwned},
-    boxed::Box,
-    ffi::CString,
-    string::String,
-    vec::Vec,
-};
+use alloc::{borrow::Cow, borrow::ToOwned, boxed::Box, ffi::CString, string::String, vec::Vec};
 
 impl<E: Encoder> Encodable<E> for Vec<u8> {
     type Error = E::Error;
@@ -58,9 +52,9 @@ impl<E: Encoder> Encodable<E> for CString {
 }
 
 #[cfg(test)]
-mod test {
+mod tests {
     use super::*;
-    use alloc::vec;
+    use crate::Encodable;
 
     #[test]
     fn assert_that_boxes_can_be_encoded() {
@@ -78,12 +72,6 @@ mod test {
     #[test]
     fn assert_that_vecs_can_be_encoded() {
         let encodable = vec![1, 2, 3, 4, 5];
-        encodable.encode(&mut ()).unwrap();
-    }
-
-    #[test]
-    fn assert_that_boxes_can_be_encoded() {
-        let encodable = Box::new(5u8);
         encodable.encode(&mut ()).unwrap();
     }
 
