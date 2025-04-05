@@ -54,7 +54,7 @@ impl<E: Encoder> Encodable<E> for CString {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::Encodable;
+    use alloc::vec;
 
     #[test]
     fn assert_that_boxes_can_be_encoded() {
@@ -67,6 +67,12 @@ mod tests {
         let cow = Cow::Borrowed("hello");
         // Explicit fully qualified call because otherwise autoref could just encode `&[u8]`.
         <Cow<'_, _> as Encodable<()>>::encode(&cow, &mut ()).unwrap();
+    }
+
+    #[test]
+    fn assert_that_vecs_can_be_encoded() {
+        let encodable = vec![1, 2, 3, 4, 5];
+        encodable.encode(&mut ()).unwrap();
     }
 
     #[test]

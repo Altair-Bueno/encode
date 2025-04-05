@@ -1,3 +1,5 @@
+use core::fmt::Write;
+
 use crate::Encoder;
 
 /// An encoder that counts the size of the encoded data.
@@ -52,7 +54,7 @@ impl From<SizeEncoder> for usize {
     }
 }
 
-impl core::fmt::Write for SizeEncoder {
+impl Write for SizeEncoder {
     fn write_str(&mut self, s: &str) -> core::fmt::Result {
         self.size += s.len();
         Ok(())
@@ -72,5 +74,17 @@ impl Encoder for SizeEncoder {
     fn put_byte(&mut self, _byte: u8) -> Result<(), Self::Error> {
         self.size += 1;
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn assert_that_size_encoder_can_be_used_with_format_strings() {
+        let mut size_encoder = SizeEncoder::new();
+        let s = "hello world";
+        write!(size_encoder, "{s}").unwrap();
+        assert_eq!(size_encoder.size(), s.len());
     }
 }
