@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.2](https://github.com/Altair-Bueno/encode/compare/v0.2.1...v0.2.2) - 2025-04-05
+
+### Other
+
+- Switch to nightly toolchain so coverage works always ([#15](https://github.com/Altair-Bueno/encode/pull/15))
+- Improve test coverage ([#10](https://github.com/Altair-Bueno/encode/pull/10))
+
 ## [0.2.1](https://github.com/Altair-Bueno/encode/compare/v0.2.0...v0.2.1) - 2025-03-26
 
 ### Added
