@@ -193,7 +193,7 @@ where
 /// destination. Encoders are used by encodables to write their data. Thus,
 /// encoders must uphold the same properties as encodables.
 #[deprecated(
-    since = "0.3.0",
+    since = "0.2.2",
     note = "The `Encoder` trait has been deprecated in favor of multiple encoder traits. Please use `ByteEncoder`, `StrEncoder`, or `BaseEncoder` depending on your needs. The `Encoder` trait will be removed in 1.0.0."
 )]
 pub trait Encoder {
