@@ -20,6 +20,7 @@ use crate::Encodable;
 /// # }
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[repr(transparent)]
 pub struct LE<E> {
     num: E,
 }
@@ -64,11 +65,13 @@ macro_rules! impl_encodeable_le_for_num {
     ($($T:ty)*) => {
         $(
             impl From<$T> for LE<$T> {
+                #[inline]
                 fn from(num: $T) -> Self {
                     Self { num }
                 }
             }
             impl From<LE<$T>> for $T {
+                #[inline]
                 fn from(le: LE<$T>) -> Self {
                     le.num
                 }
@@ -91,11 +94,13 @@ macro_rules! impl_encodeable_le_for_nonzero_num {
     ($($T:ty)*) => {
         $(
             impl From<NonZero<$T>> for LE<NonZero<$T>> {
+                #[inline]
                 fn from(num: NonZero<$T>) -> Self {
                     Self { num }
                 }
             }
             impl From<LE<NonZero<$T>>> for NonZero<$T> {
+                #[inline]
                 fn from(le: LE<NonZero<$T>>) -> Self {
                     le.num
                 }
@@ -120,6 +125,7 @@ macro_rules! impl_try_from_le_for_num {
             impl TryFrom<usize> for LE<$T> {
                 type Error = core::num::TryFromIntError;
 
+                #[inline]
                 fn try_from(value: usize) -> Result<Self, Self::Error> {
                     <$T>::try_from(value).map(Self::new)
                 }

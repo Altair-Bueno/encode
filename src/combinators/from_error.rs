@@ -46,6 +46,7 @@ impl<E, DstError> FromError<E, DstError> {
 
 impl<E, DstError> Deref for FromError<E, DstError> {
     type Target = E;
+    #[inline]
     fn deref(&self) -> &Self::Target {
         self.as_ref()
     }
@@ -57,6 +58,7 @@ impl<E, DstError> AsRef<E> for FromError<E, DstError> {
     }
 }
 impl<E, DstError> Borrow<E> for FromError<E, DstError> {
+    #[inline]
     fn borrow(&self) -> &E {
         &self.encodable
     }
@@ -87,6 +89,7 @@ impl<E: Debug, DstError> Debug for FromError<E, DstError> {
     }
 }
 impl<E: Clone, DstError> Clone for FromError<E, DstError> {
+    #[inline]
     fn clone(&self) -> Self {
         Self {
             encodable: self.encodable.clone(),
@@ -96,6 +99,7 @@ impl<E: Clone, DstError> Clone for FromError<E, DstError> {
 }
 impl<E: Copy, DstError> Copy for FromError<E, DstError> {}
 impl<E: Default, DstError> Default for FromError<E, DstError> {
+    #[inline]
     fn default() -> Self {
         Self {
             encodable: Default::default(),
@@ -104,17 +108,20 @@ impl<E: Default, DstError> Default for FromError<E, DstError> {
     }
 }
 impl<E: PartialEq, DstError> PartialEq for FromError<E, DstError> {
+    #[inline]
     fn eq(&self, other: &Self) -> bool {
         self.encodable == other.encodable && self.error == other.error
     }
 }
 impl<E: Eq, DstError> Eq for FromError<E, DstError> {}
 impl<E: PartialOrd, DstError> PartialOrd for FromError<E, DstError> {
+    #[inline]
     fn partial_cmp(&self, other: &Self) -> Option<core::cmp::Ordering> {
         self.encodable.partial_cmp(&other.encodable)
     }
 }
 impl<E: Ord, DstError> Ord for FromError<E, DstError> {
+    #[inline]
     fn cmp(&self, other: &Self) -> core::cmp::Ordering {
         self.encodable.cmp(&other.encodable)
     }

@@ -8,6 +8,7 @@ where
 {
     type Error = T::Error;
 
+    #[inline]
     fn encode(&self, encoder: &mut E) -> Result<(), Self::Error> {
         match self {
             Some(value) => value.encode(encoder),
@@ -24,6 +25,7 @@ where
 {
     type Error = T::Error;
 
+    #[inline]
     fn encode(&self, encoder: &mut E) -> Result<(), Self::Error> {
         match self {
             Ok(value) => value.encode(encoder),

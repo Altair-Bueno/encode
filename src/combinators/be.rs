@@ -20,6 +20,7 @@ use crate::Encodable;
 /// # }
 /// ```
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[repr(transparent)]
 pub struct BE<E> {
     num: E,
 }
@@ -64,11 +65,13 @@ macro_rules! impl_encodeable_be_for_num {
     ($($T:ty)*) => {
         $(
             impl From<$T> for BE<$T> {
+                #[inline]
                 fn from(num: $T) -> Self {
                     Self { num }
                 }
             }
             impl From<BE<$T>> for $T {
+                #[inline]
                 fn from(be: BE<$T>) -> Self {
                     be.num
                 }
@@ -91,11 +94,13 @@ macro_rules! impl_encodeable_be_for_nonzero_num {
     ($($T:ty)*) => {
         $(
             impl From<NonZero<$T>> for BE<NonZero<$T>> {
+                #[inline]
                 fn from(num: NonZero<$T>) -> Self {
                     Self { num }
                 }
             }
             impl From<BE<NonZero<$T>>> for NonZero<$T> {
+                #[inline]
                 fn from(be: BE<NonZero<$T>>) -> Self {
                     be.num
                 }
@@ -120,6 +125,7 @@ macro_rules! impl_try_from_be_for_num {
             impl TryFrom<usize> for BE<$T> {
                 type Error = core::num::TryFromIntError;
 
+                #[inline]
                 fn try_from(value: usize) -> Result<Self, Self::Error> {
                     <$T>::try_from(value).map(Self::new)
                 }

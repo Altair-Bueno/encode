@@ -28,6 +28,7 @@ use crate::ByteEncoder;
 ///
 /// [`Encodable`]: crate::Encodable
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Default)]
+#[repr(transparent)]
 pub struct SizeEncoder {
     size: usize,
 }
@@ -49,12 +50,14 @@ impl SizeEncoder {
 }
 
 impl From<SizeEncoder> for usize {
+    #[inline]
     fn from(encoder: SizeEncoder) -> usize {
         encoder.size
     }
 }
 
 impl Write for SizeEncoder {
+    #[inline]
     fn write_str(&mut self, s: &str) -> core::fmt::Result {
         self.size += s.len();
         Ok(())
