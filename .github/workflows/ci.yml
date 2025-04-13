@@ -35,15 +35,16 @@ jobs:
         id: taplo
         run: taplo fmt --check --diff
 
-  markdownlint:
+  prettier-fmt:
     runs-on: ubuntu-latest
     steps:
-      - name: Fetch Repository
-        uses: actions/checkout@v4
-      - name: markdownlint-cli2-action
-        uses: DavidAnson/markdownlint-cli2-action@v19
+      - uses: actions/checkout@v4 # Check out the repository first.
+      - uses: actionsx/prettier@v3
         with:
-          globs: "**/*.md"
+          # prettier CLI arguments.
+          args:
+            --check '**/*.{md,js,ts,jsx,tsx,json,yml,yaml,css,scss,html}'
+            '!CHANGELOG.md'
 
   define-matrix:
     runs-on: ubuntu-latest
@@ -87,11 +88,16 @@ jobs:
       - name: Check formatting
         run: cargo fmt --all -- --check
       - name: Run tests
-        run: cargo test --no-default-features --features '${{ matrix.features }}' --all-targets
+        run:
+          cargo test --no-default-features --features '${{ matrix.features }}'
+          --all-targets
       - name: Run doc tests
-        run: cargo test --no-default-features --features '${{ matrix.features }}' --doc
+        run:
+          cargo test --no-default-features --features '${{ matrix.features }}'
+          --doc
       - name: Run linter
-        run: cargo clippy --no-default-features --features '${{ matrix.features }}'
+        run:
+          cargo clippy --no-default-features --features '${{ matrix.features }}'
   coverage:
     name: Coverage
     needs:
@@ -109,7 +115,9 @@ jobs:
         with:
           tool: cargo-tarpaulin
       - name: Gather coverage
-        run: cargo tarpaulin --output-dir coverage --out lcov --all-features --doc --all-targets
+        run:
+          cargo tarpaulin --output-dir coverage --out lcov --all-features --doc
+          --all-targets
       - name: Publish to Codecov
         uses: codecov/codecov-action@v5
         env:
