@@ -64,7 +64,7 @@ impl<E: StrEncoder> Encodable<E> for Json {
             Json::Bool(false) => "false".encode(encoder),
             // We use format_args! for numbers to avoid the overhead of allocating a string.
             Json::Number(n) => format_args!("{n}").encode(encoder),
-            // We use the custom `JsonString` combinator to scape the string according to the JSON
+            // We use the custom `JsonString` combinator to escape the string according to the JSON
             // spec.
             Json::String(s) => JsonString(s).encode(encoder),
             // We use the `Separated` combinator to encode the iterator (&Vec<Json>) as a JSON
