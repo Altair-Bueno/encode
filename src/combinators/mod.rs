@@ -46,7 +46,7 @@
 //! | [`FromError`] | Transforms the error type of an encodable. |
 #![cfg_attr(
     feature = "alloc",
-    doc = r"## Alloc Encodables (requires the `alloc` feature)
+    doc = r"## Alloc Encodables (requires the `alloc` OR `std` features)
 
 These types are supported when the `alloc` or `std` feature is enabled.
 
