@@ -52,14 +52,14 @@ mod test {
     #[test]
     fn assert_that_arrayvecs_can_be_used_as_encoders() {
         let mut buf = ArrayVec::<u8, 64>::new();
-        let encodable = "hello";
+        let encodable = ("hello", 0u8);
 
         encodable.encode(&mut buf).unwrap();
 
-        assert_eq!(buf.len(), 5, "The buffer should contain 5 bytes");
+        assert_eq!(buf.len(), 6, "The buffer should contain 5 bytes");
         assert_eq!(
             buf.as_slice(),
-            b"hello",
+            b"hello\0",
             "The buffer should contain the encoded string"
         );
     }
