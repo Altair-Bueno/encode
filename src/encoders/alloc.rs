@@ -9,11 +9,13 @@ impl BaseEncoder for Vec<u8> {
 }
 
 impl ByteEncoder for Vec<u8> {
+    #[inline]
     fn put_slice(&mut self, slice: &[u8]) -> Result<(), Self::Error> {
         self.extend(slice);
         Ok(())
     }
 
+    #[inline]
     fn put_byte(&mut self, byte: u8) -> Result<(), Self::Error> {
         self.push(byte);
         Ok(())
@@ -25,6 +27,7 @@ impl BaseEncoder for String {
 }
 
 impl StrEncoder for String {
+    #[inline]
     fn put_str(&mut self, string: &str) -> Result<(), Self::Error> {
         self.push_str(string);
         Ok(())

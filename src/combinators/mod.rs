@@ -44,6 +44,7 @@
 //! | [`Separated`] | Encodes a sequence of encodables separated by a given delimiter |
 //! | [`Iter`] | Encodes a sequence of encodables |
 //! | [`FromError`] | Transforms the error type of an encodable. |
+//!
 #![cfg_attr(
     feature = "alloc",
     doc = r"## Alloc Encodables (requires the `alloc` OR `std` features)
@@ -56,9 +57,31 @@ These types are supported when the `alloc` or `std` feature is enabled.
 | [`String`] | Encodes a heap-allocated UTF-8 string |
 | [`CString`](std::ffi::CString) | Encodes a C-style string including the null terminator (`\0`) |
 | [`Box<T>`] | Encodes the value pointed to by a `Box`, as if it were directly encoded |
+
 "
 )]
+#[cfg_attr(
+    feature = "arrayvec",
+    doc = r"## ArrayVec Encodables (requires the `arrayvec` feature)
+These types are supported when the `arrayvec` feature is enabled.
+| Type | Description |
+|------|-------------|
+| [`ArrayVec<T, N>`] | Encodes a fixed-size array of bytes as a contiguous sequence of bytes |
+| [`ArrayString<N>`] | Encodes a fixed-size string as a contiguous sequence of bytes |
 
+"
+)]
+#[cfg_attr(
+    feature = "bytes",
+    doc = r"## Bytes Encodables (requires the `bytes` feature)
+These types are supported when the `bytes` feature is enabled.
+| Type | Description |
+|------|-------------|
+| [`Bytes`] | Encodes a `Bytes` object as a contiguous sequence of bytes |
+| [`BytesMut`] | Encodes a `BytesMut` object as a contiguous sequence of bytes |
+
+"
+)]
 mod be;
 mod cond;
 mod flags;

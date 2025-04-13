@@ -9,11 +9,13 @@ impl BaseEncoder for BytesMut {
 }
 
 impl ByteEncoder for BytesMut {
+    #[inline]
     fn put_slice(&mut self, slice: &[u8]) -> Result<(), Self::Error> {
         BufMut::put_slice(self, slice);
         Ok(())
     }
 
+    #[inline]
     fn put_byte(&mut self, byte: u8) -> Result<(), Self::Error> {
         BufMut::put_u8(self, byte);
         Ok(())

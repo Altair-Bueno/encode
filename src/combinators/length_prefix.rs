@@ -45,6 +45,7 @@ impl<Encodable, Length, Error> LengthPrefix<Encodable, Length, Error> {
 }
 
 impl<Encodable, Length, Error> From<Encodable> for LengthPrefix<Encodable, Length, Error> {
+    #[inline]
     fn from(value: Encodable) -> Self {
         Self::new(value)
     }
@@ -59,12 +60,14 @@ impl<Encodable, Length, Error> AsRef<Encodable> for LengthPrefix<Encodable, Leng
 
 impl<Encodable, Length, Error> Deref for LengthPrefix<Encodable, Length, Error> {
     type Target = Encodable;
+    #[inline]
     fn deref(&self) -> &Self::Target {
         self.as_ref()
     }
 }
 
 impl<Encodable, Length, Error> Borrow<Encodable> for LengthPrefix<Encodable, Length, Error> {
+    #[inline]
     fn borrow(&self) -> &Encodable {
         &self.encodable
     }
@@ -111,6 +114,7 @@ impl<Encodable, Length, Error> Clone for LengthPrefix<Encodable, Length, Error>
 where
     Encodable: Clone,
 {
+    #[inline]
     fn clone(&self) -> Self {
         Self {
             encodable: self.encodable.clone(),
@@ -123,6 +127,7 @@ impl<Encodable, Length, Error> Default for LengthPrefix<Encodable, Length, Error
 where
     Encodable: Default,
 {
+    #[inline]
     fn default() -> Self {
         Self {
             encodable: Default::default(),
@@ -134,6 +139,7 @@ impl<Encodable, Length, Error> PartialEq for LengthPrefix<Encodable, Length, Err
 where
     Encodable: PartialEq,
 {
+    #[inline]
     fn eq(&self, other: &Self) -> bool {
         self.encodable == other.encodable && self.phantom == other.phantom
     }
@@ -143,6 +149,7 @@ impl<Encodable, Length, Error> PartialOrd for LengthPrefix<Encodable, Length, Er
 where
     Encodable: PartialOrd,
 {
+    #[inline]
     fn partial_cmp(&self, other: &Self) -> Option<core::cmp::Ordering> {
         self.encodable.partial_cmp(&other.encodable)
     }
@@ -151,6 +158,7 @@ impl<Encodable, Length, Error> Ord for LengthPrefix<Encodable, Length, Error>
 where
     Encodable: Ord,
 {
+    #[inline]
     fn cmp(&self, other: &Self) -> core::cmp::Ordering {
         self.encodable.cmp(&other.encodable)
     }

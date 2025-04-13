@@ -9,6 +9,7 @@ impl BaseEncoder for Formatter<'_> {
 }
 
 impl StrEncoder for Formatter<'_> {
+    #[inline]
     fn put_str(&mut self, string: &str) -> Result<(), Self::Error> {
         self.write_str(string)
     }
