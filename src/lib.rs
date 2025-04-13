@@ -25,108 +25,131 @@ pub mod combinators;
 pub mod encoders;
 mod impls;
 
-/// A trait for types that can be encoded/serialized into an encoder.
+/// A trait for types that can be encoded into a specific encoder.
 ///
-/// # Overview
+/// Defines a generic interface for encoding data structures into
+/// an encoder.
 ///
-/// The `Encodable` trait defines the interface for encoding types into a
-/// specified encoder. This trait is generic over the encoder type, allowing
-/// for flexibility and specialization.
+/// ## A note about purity
 ///
-/// # Implementation Requirements
+/// Implementations of `Encodable` **must be pure**. That means:
 ///
-/// Implementations of the `Encodable` trait **must** be pure, meaning they must
-/// adhere to the following properties:
+/// - **No side effects**: Implementations must not modify global or external
+///   state.
+/// - **Deterministic**: Given the same input and encoder, the output must
+///   always be the same.
+/// - **No panics**: Panicking inside an `encode` implementation is considered a
+///   bug.
 ///
-/// - **No Side Effects:** The encoding process should not cause any side
-///   effects.
-/// - **Deterministic Output:** The same input must always produce the same
-///   output.
+/// Ignoring these rules may lead to logic errors.
 ///
-/// Examples of non-idempotent encodes include:
+/// ## Encoder Specialization
 ///
-/// - Writing to a file or other I/O device.
-/// - Using random number generators.
-/// - Panicking during the encoding process.
-/// - Modifying or relying on global state.
+/// On nightly Rust, you can use [trait specialization](https://rust-lang.github.io/rfcs/1210-impl-specialization.html)
+/// to implement optimized encodings for specific encoders, such as
+/// [`SizeEncoder`](encoders::SizeEncoder). For example, you may want to use
+/// this if your encoder runs computationally expensive operations for obtaining
+/// the size of the encoded form.
 ///
-/// # Encoder Specialization (requires a nightly compiler)
+/// ## Errors
 ///
-/// The `Encodable` trait is designed to be flexible and can be specialized for
-/// different encoder types. For example, if you are running some sort of heavy
-/// computation for encoding a type, but you are sure of the final size of the
-/// encoded data, you can specialize the encoder for `SizeEncoder`.
+/// Implementations must return an appropriate error if encoding fails. Errors
+/// can occur if:
+/// - The encoder encounters an internal error (e.g., out of space).
+/// - The encoded output would be invalid.
 ///
-/// # Errors
-///
-/// Implementations of this trait shall return an appropriate error if encoding
-/// fails due to an encoder error or if the encoder fails to store the encoded
-/// data.
-///
-/// Note that, contrary to `core::fmt::Write`, control flow operations are
-/// allowed based on encoding errors.
+/// Control flow may depend on these errors (unlike [`core::fmt::Write`]).
 pub trait Encodable<E>
 where
     E: BaseEncoder,
 {
-    /// The error type that can be returned when encoding `self`.
+    /// The error type returned by the `encode` method.
     ///
-    /// For example, some encodables may abort encoding if encoding would
-    /// produce an invalid byte stream as dictated by the encoding format.
+    /// This must include the encoder's error type via `From<E::Error>`.
     type Error: From<E::Error>;
 
-    /// Encodes `self` into the given `encoder`.
+    /// Encodes `self` into the given encoder.
     ///
     /// # Errors
     ///
-    /// Implementations of this method should return an error if encoding fails
-    /// due to an encoder error or if the encoding would produce an invalid byte
-    /// stream as dictated by the encoding format.
+    /// Returns an error if writing fails or if the encoded output would be
+    /// invalid.
     fn encode(&self, encoder: &mut E) -> Result<(), Self::Error>;
 }
-/// A type that can handle an [`Encodable`] type.
+
+/// A trait that defines common Encoder types and operations that are used to
+/// encode [`Encodable`] types.
 ///
-/// The `BaseEncoder` trait specifies the basic interface required for a type
-/// to be used as an encoder for an [`Encodable`].
+/// The `BaseEncoder` trait is the foundation for all encoders, providing a
+/// common interface for encoding operations. It's the main building block for
+/// all [`combinators`].
 pub trait BaseEncoder {
-    /// The error type that can be returned when encoding a value.
+    /// The error type returned by all encoding operations.
     ///
-    /// For example, some encoders may return an error if the underlying buffer
-    /// is full
+    /// For example, an encoder might return an error if the output buffer is
+    /// full.
     type Error;
 }
 
-/// A type that can handle UTF-8 [`Encodable`]s
+/// A trait for encoders that can encode UTF-8 strings.
+///
+/// This trait extends [`BaseEncoder`] to include a method specifically for
+/// handling UTF-8 string values. It is implemented by encoders that support
+/// text encoding.
 pub trait StrEncoder: BaseEncoder {
-    /// Appends a UTF-8 string into the encoder, if possible.
+    /// Writes an [`str`] into the encoder.
     ///
     /// # Errors
     ///
-    /// Implementations of this method should return an error if the underlying
-    /// encoder fails to write the string.
+    /// Returns an error if the encoder is unable to write the string
+    /// due to capacity limits, encoding errors, or internal failures.
     fn put_str(&mut self, string: &str) -> Result<(), Self::Error>;
 }
 
-/// A type that can handle any [`Encodable`] type
+/// A trait for encoders that can encode raw byte data.
 ///
-/// An encoder is responsible for writing bytes into a buffer or other
-/// destination. Encoders are used by encodables to write their data. Thus,
-/// encoders must uphold the same properties as encodables.
+/// This trait extends [`BaseEncoder`] with methods for writing individual
+/// bytes or byte slices. It is implemented by encoders that support
+/// binary encoding.
+///
+/// Note that all [`ByteEncoder`]s also implement [`StrEncoder`].
 pub trait ByteEncoder: BaseEncoder {
-    /// Copies a slice of bytes into the encoder
+    /// Writes a slice of bytes into the encoder.
     ///
     /// # Errors
     ///
-    /// Implementations of this method should return an error if the underlying
-    /// encoder fails to write the slice of bytes.
+    /// Returns an error if the encoder cannot write the entire slice.
     fn put_slice(&mut self, slice: &[u8]) -> Result<(), Self::Error>;
-    /// Appends a single byte into the encoder, if possible.
+    /// Writes a single byte into the encoder.
     ///
     /// # Errors
     ///
-    /// Implementations of this method should return an error if the underlying
-    /// encoder fails to write the byte.
+    /// Returns an error if the encoder cannot write the byte.
     fn put_byte(&mut self, byte: u8) -> Result<(), Self::Error>;
+}
+
+/// An extension trait for types that can compute the size of their encoded form
+/// using a [`SizeEncoder`].
+///
+/// This trait is automatically implemented for all types that implement
+/// [`Encodable`] for [`SizeEncoder`].
+///
+/// Use this trait to pre-compute buffer sizes or perform validations before
+/// full encoding.
+///
+/// ## Errors
+///
+/// Returns an error if the [`Encodable`] fails to encode.
+///
+/// [`SizeEncoder`]: encoders::SizeEncoder
+pub trait EncodableSize: Encodable<encoders::SizeEncoder> {
+    /// Computes the size of the encoded representation of `self`.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if encoding fails internally during the size
+    /// estimation.
+    fn encoded_size(&self) -> Result<usize, Self::Error>;
 }
 
 impl<T> StrEncoder for T
@@ -138,25 +161,6 @@ where
         string.as_bytes().encode(self)
     }
 }
-
-/// An extension trait for types that can calculate the size of their encoded
-/// form.
-///
-/// This trait is implemented for all types that implement the [`Encodable`]
-/// trait for [`SizeEncoder`].
-///
-/// See the [`SizeEncoder`] encoder for more information.
-///
-/// [`SizeEncoder`]: encoders::SizeEncoder
-pub trait EncodableSize: Encodable<encoders::SizeEncoder> {
-    /// Returns the size of the encoded form of `self`.
-    ///
-    /// # Errors
-    ///
-    /// If encoding fails, this method will return an error.
-    fn encoded_size(&self) -> Result<usize, Self::Error>;
-}
-
 impl<T> EncodableSize for T
 where
     T: Encodable<encoders::SizeEncoder>,
