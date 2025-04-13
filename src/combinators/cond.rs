@@ -1,7 +1,7 @@
 use core::borrow::Borrow;
 use core::ops::Deref;
 
-/// Conditionally encodes an encodable.
+///  Encodes a value only if a condition is met
 ///
 /// # Examples
 ///

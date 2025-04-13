@@ -1,5 +1,4 @@
-/// A combinator that encodes an iterator of encodables as a sequence with
-/// separators.
+/// Encodes a sequence of encodables separated by a given delimiter.
 ///
 /// # Example
 ///

@@ -1,7 +1,7 @@
 use core::borrow::Borrow;
 use core::ops::Deref;
 
-/// A combinator that encodes an iterator of encodables as a sequence.
+/// Encodes a sequence of encodables.
 ///
 /// # Example
 ///

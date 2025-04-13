@@ -4,7 +4,7 @@ use core::ops::Deref;
 use crate::ByteEncoder;
 use crate::Encodable;
 
-/// A combinator that encodes a sequence of flags as a single byte.
+/// Encodes a set of bit flags packed into a single byte
 ///
 /// # Examples
 ///
