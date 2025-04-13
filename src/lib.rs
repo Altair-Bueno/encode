@@ -88,6 +88,8 @@ where
 /// The `BaseEncoder` trait is the foundation for all encoders, providing a
 /// common interface for encoding operations. It's also the main building block
 /// for all [`combinators`].
+///
+/// [`SizeEncoder`]: encoders::SizeEncoder
 pub trait BaseEncoder {
     /// The error type returned by all encoding operations.
     ///

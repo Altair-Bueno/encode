@@ -16,7 +16,7 @@
 //! | Type | Description | [`BaseEncoder`] | [`StrEncoder`] | [`ByteEncoder`] | Requires feature |
 //! |------|-------------|-----------------|----------------|-----------------|------------------|
 //! | [`()`](unit) | A no-op encoder. Useful for testing combinators or skipping output. | ✅ | ✅ | ✅ | - |
-//! | [`Formatter`](core::fmt::Formatter) | Writes data into a Rust [`core::io::Writer`]. Useful for implementing [`Display`] or [`Debug`]. | ✅ | ✅ | ❌ | - |
+//! | [`Formatter`](core::fmt::Formatter) | Writes data into a Rust [`core::fmt::Write`]. Useful for implementing [`Display`] or [`Debug`]. | ✅ | ✅ | ❌ | - |
 //! | [`SizeEncoder`] | Counts how many bytes would be encoded. Useful for sizing buffers. | ✅ | ✅ | ✅ | - |
 //! | [`&mut [u8]`](slice) | Writes bytes into a fixed-size mutable slice. Fails if full. | ✅ | ✅ | ✅ | - |
 #![cfg_attr(
