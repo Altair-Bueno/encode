@@ -11,7 +11,7 @@
 use encode::combinators::Separated;
 use encode::Encodable;
 use encode::EncodableSize;
-use encode::Encoder;
+use encode::StrEncoder;
 use std::collections::HashMap;
 
 /// Our JSON data type.
@@ -29,7 +29,7 @@ pub enum Json {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct JsonString<S>(pub S);
 
-impl<S: AsRef<str>, E: Encoder> Encodable<E> for JsonString<S> {
+impl<S: AsRef<str>, E: StrEncoder> Encodable<E> for JsonString<S> {
     type Error = E::Error;
 
     fn encode(&self, encoder: &mut E) -> Result<(), Self::Error> {
@@ -52,7 +52,7 @@ impl<S: AsRef<str>, E: Encoder> Encodable<E> for JsonString<S> {
     }
 }
 
-impl<E: Encoder> Encodable<E> for Json {
+impl<E: StrEncoder> Encodable<E> for Json {
     type Error = E::Error;
 
     #[inline]
@@ -64,9 +64,11 @@ impl<E: Encoder> Encodable<E> for Json {
             Json::Bool(false) => "false".encode(encoder),
             // We use format_args! for numbers to avoid the overhead of allocating a string.
             Json::Number(n) => format_args!("{n}").encode(encoder),
-            // We use the custom `JsonString` combinator to scape the string according to the JSON spec.
+            // We use the custom `JsonString` combinator to scape the string according to the JSON
+            // spec.
             Json::String(s) => JsonString(s).encode(encoder),
-            // We use the `Separated` combinator to encode the iterator (&Vec<Json>) as a JSON array.
+            // We use the `Separated` combinator to encode the iterator (&Vec<Json>) as a JSON
+            // array.
             Json::Array(a) => ('[', Separated::new(a, ','), ']').encode(encoder),
             // Notice how we can use tuples to add the bracket prefix and suffix to the object.
             Json::Object(o) => (
@@ -76,6 +78,16 @@ impl<E: Encoder> Encodable<E> for Json {
             )
                 .encode(encoder),
         }
+    }
+}
+
+// Notice how we can use our encoder to implement traits such as `Display`.
+//
+// Pretty printing could be archived by dispatching to a different encoder if
+// `f.alternative()` is true.
+impl std::fmt::Display for Json {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.encode(f)
     }
 }
 
@@ -98,10 +110,11 @@ fn main() -> Result<(), Box<dyn core::error::Error>> {
     let size = json.encoded_size()?;
     println!("Expected JSON size: {}", size);
 
-    // We can also encode the JSON string into a buffer, like a Vec<u8> or &mut [u8].
-    let mut buf = Vec::with_capacity(size);
-    json.encode(&mut buf)?;
-    let s = String::from_utf8(buf).expect("Our encoder always produces valid UTF-8");
+    // We can also encode the JSON string into a buffer, like a Vec<u8> or &mut
+    // [u8]. Because our encoder is an `StrEncoder` and it can only generate
+    // UTF-8 valid data, we can use a `String` as the buffer.
+    let mut s = String::with_capacity(size);
+    json.encode(&mut s)?;
 
     println!("{s}");
     assert_eq!(

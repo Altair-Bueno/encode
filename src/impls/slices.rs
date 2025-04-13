@@ -1,11 +1,12 @@
 use core::ffi::CStr;
 
+use crate::ByteEncoder;
 use crate::Encodable;
-use crate::Encoder;
+use crate::StrEncoder;
 
 impl<E> Encodable<E> for [u8]
 where
-    E: Encoder,
+    E: ByteEncoder,
 {
     type Error = E::Error;
 
@@ -17,7 +18,7 @@ where
 
 impl<const SIZE: usize, E> Encodable<E> for [u8; SIZE]
 where
-    E: Encoder,
+    E: ByteEncoder,
 {
     type Error = E::Error;
 
@@ -29,19 +30,19 @@ where
 
 impl<E> Encodable<E> for str
 where
-    E: Encoder,
+    E: StrEncoder,
 {
     type Error = E::Error;
 
     #[inline]
     fn encode(&self, encoder: &mut E) -> Result<(), Self::Error> {
-        self.as_bytes().encode(encoder)
+        encoder.put_str(self)
     }
 }
 
 impl<E> Encodable<E> for CStr
 where
-    E: Encoder,
+    E: ByteEncoder,
 {
     type Error = E::Error;
 

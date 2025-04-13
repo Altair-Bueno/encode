@@ -33,18 +33,19 @@ crate.
 - Simple and flexible API
 - Minimal dependencies
 - Ready to use combinators for minimizing boilerplate.
+- Write encoders that serialize data to UTF-8 and/or raw bytes
 
 ## Cargo features
 
 - `default`: Enables the `std` feature.
 - `std`: Enables the use of the standard library.
 - `alloc`: Enables the use of the `alloc` crate.
-- `arrayvec`: Implements [`Encodable`] for [`arrayvec::ArrayVec`].
+- `arrayvec`: Implements [`ByteEncodable`] for [`arrayvec::ArrayVec`] and [`ByteEncodable`] for [`arrayvec::ArrayString`].
 - `bytes`: Implements [`Encodable`] for [`bytes::BytesMut`].
 
 ## FAQs
 
-### Why the `Encoder` trait instead of `bytes::BufMut`?
+### Why the `ByteEncoder` trait instead of `bytes::BufMut`?
 
 From
 [bytes documentation](https://docs.rs/bytes/latest/bytes/buf/trait.BufMut.html)
@@ -57,10 +58,23 @@ The bytes crate was never designed with falible writes nor `no_std` targets in
 mind. This means that targets with little memory are forced to crash when memory
 is low, instead of gracefully handling errors.
 
-### Why the `Encoder` trait instead of `std::io::Write`?
+### Why the `ByteEncoder` trait instead of `std::io::Write`?
 
 Because
 [it's not available on `no_std`](https://github.com/rust-lang/rust/issues/48331)
+
+### Why the `StrEncoder` trait instead of `std::fmt::Write`?
+
+Because `std::fmt::Write` is not implemented for a lot of types, most notably
+`Vec<u8>` or `&mut [u8]`. This means that you would have to use some sort of
+adapter in between to use these types as buffers. Furthermore, `std::fmt::Write`
+the error type is limited on what it can do:
+
+> The purpose of that error is to abort the formatting operation when the
+> underlying destination encounters some error preventing it from accepting more
+> text; in particular, it does not communicate any information about what error
+> occurred. It should generally be propagated rather than handled, at least when
+> implementing formatting traits.
 
 ### Why did you build this?
 

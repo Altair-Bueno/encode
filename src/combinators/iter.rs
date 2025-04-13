@@ -65,7 +65,7 @@ impl<EncodableIter, Encoder> crate::Encodable<Encoder> for Iter<EncodableIter>
 where
     EncodableIter: IntoIterator + Clone,
     EncodableIter::Item: crate::Encodable<Encoder>,
-    Encoder: crate::Encoder,
+    Encoder: crate::BaseEncoder,
 {
     type Error = <EncodableIter::Item as crate::Encodable<Encoder>>::Error;
 

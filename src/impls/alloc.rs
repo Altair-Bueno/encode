@@ -1,8 +1,10 @@
+use crate::BaseEncoder;
+use crate::ByteEncoder;
 use crate::Encodable;
-use crate::Encoder;
+use crate::StrEncoder;
 use alloc::{borrow::Cow, borrow::ToOwned, boxed::Box, ffi::CString, string::String, vec::Vec};
 
-impl<E: Encoder> Encodable<E> for Vec<u8> {
+impl<E: ByteEncoder> Encodable<E> for Vec<u8> {
     type Error = E::Error;
 
     #[inline]
@@ -11,7 +13,7 @@ impl<E: Encoder> Encodable<E> for Vec<u8> {
     }
 }
 
-impl<E: Encoder, T: Encodable<E>> Encodable<E> for Box<T> {
+impl<E: BaseEncoder, T: Encodable<E>> Encodable<E> for Box<T> {
     type Error = T::Error;
 
     #[inline]
@@ -23,7 +25,7 @@ impl<E: Encoder, T: Encodable<E>> Encodable<E> for Box<T> {
 impl<E, T> Encodable<E> for Cow<'_, T>
 where
     T: ToOwned + Encodable<E> + ?Sized,
-    E: Encoder,
+    E: BaseEncoder,
 {
     type Error = T::Error;
 
@@ -33,7 +35,7 @@ where
     }
 }
 
-impl<E: Encoder> Encodable<E> for String {
+impl<E: StrEncoder> Encodable<E> for String {
     type Error = E::Error;
 
     #[inline]
@@ -42,7 +44,7 @@ impl<E: Encoder> Encodable<E> for String {
     }
 }
 
-impl<E: Encoder> Encodable<E> for CString {
+impl<E: ByteEncoder> Encodable<E> for CString {
     type Error = E::Error;
 
     #[inline]
@@ -65,7 +67,8 @@ mod tests {
     #[test]
     fn assert_that_cows_can_be_encoded() {
         let cow = Cow::Borrowed("hello");
-        // Explicit fully qualified call because otherwise autoref could just encode `&[u8]`.
+        // Explicit fully qualified call because otherwise autoref could just encode
+        // `&[u8]`.
         <Cow<'_, _> as Encodable<()>>::encode(&cow, &mut ()).unwrap();
     }
 

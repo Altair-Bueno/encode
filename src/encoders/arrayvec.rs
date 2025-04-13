@@ -1,11 +1,16 @@
+use arrayvec::ArrayString;
 use arrayvec::ArrayVec;
 
 use super::InsufficientSpace;
-use crate::Encoder;
+use crate::BaseEncoder;
+use crate::ByteEncoder;
+use crate::StrEncoder;
 
-impl<const SIZE: usize> Encoder for ArrayVec<u8, SIZE> {
+impl<const SIZE: usize> BaseEncoder for ArrayVec<u8, SIZE> {
     type Error = InsufficientSpace;
+}
 
+impl<const SIZE: usize> ByteEncoder for ArrayVec<u8, SIZE> {
     #[inline]
     fn put_slice(&mut self, slice: &[u8]) -> Result<(), Self::Error> {
         self.try_extend_from_slice(slice)
@@ -15,6 +20,17 @@ impl<const SIZE: usize> Encoder for ArrayVec<u8, SIZE> {
     #[inline]
     fn put_byte(&mut self, byte: u8) -> Result<(), Self::Error> {
         self.try_push(byte).map_err(|_| InsufficientSpace)
+    }
+}
+
+impl<const SIZE: usize> BaseEncoder for ArrayString<SIZE> {
+    type Error = InsufficientSpace;
+}
+
+impl<const SIZE: usize> StrEncoder for ArrayString<SIZE> {
+    #[inline]
+    fn put_str(&mut self, string: &str) -> Result<(), Self::Error> {
+        self.try_push_str(string).map_err(|_| InsufficientSpace)
     }
 }
 

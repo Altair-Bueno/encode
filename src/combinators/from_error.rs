@@ -66,7 +66,7 @@ impl<Encodable, Encoder, DstError> crate::Encodable<Encoder> for FromError<Encod
 where
     DstError: From<Encodable::Error> + From<Encoder::Error>,
     Encodable: crate::Encodable<Encoder>,
-    Encoder: crate::Encoder,
+    Encoder: crate::BaseEncoder,
 {
     type Error = DstError;
 

@@ -1,6 +1,7 @@
 use core::fmt::Write;
 
-use crate::Encoder;
+use crate::BaseEncoder;
+use crate::ByteEncoder;
 
 /// An encoder that counts the size of the encoded data.
 ///
@@ -8,15 +9,14 @@ use crate::Encoder;
 /// actually encoding it, allowing you to pre-allocate a buffer of the correct
 /// size before encoding the data.
 ///
-/// Note that this encoder runs all the same encoding logic as any other encoder,
-/// so it will trigger the same side effects that other encoders would trigger
-/// (e.g Allocations). See the [`Encodable`] trait for more information on
-/// idempotent encodes.
+/// Note that this encoder runs all the same encoding logic as any other
+/// encoder, so it will trigger the same side effects that other encoders would
+/// trigger (e.g Allocations). See the [`Encodable`] trait for more information
+/// on idempotent encodes.
 ///
 /// # Example
 ///
 /// ```
-/// use encode::Encoder;
 /// use encode::Encodable;
 /// use encode::encoders::SizeEncoder;
 ///
@@ -61,9 +61,11 @@ impl Write for SizeEncoder {
     }
 }
 
-impl Encoder for SizeEncoder {
+impl BaseEncoder for SizeEncoder {
     type Error = core::convert::Infallible;
+}
 
+impl ByteEncoder for SizeEncoder {
     #[inline]
     fn put_slice(&mut self, slice: &[u8]) -> Result<(), Self::Error> {
         self.size += slice.len();

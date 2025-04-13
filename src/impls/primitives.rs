@@ -1,7 +1,8 @@
+use crate::ByteEncoder;
 use crate::Encodable;
-use crate::Encoder;
+use crate::StrEncoder;
 
-impl<E: Encoder> Encodable<E> for char {
+impl<E: StrEncoder> Encodable<E> for char {
     type Error = E::Error;
 
     #[inline]
@@ -11,7 +12,7 @@ impl<E: Encoder> Encodable<E> for char {
     }
 }
 
-impl<E: Encoder> Encodable<E> for u8 {
+impl<E: ByteEncoder> Encodable<E> for u8 {
     type Error = E::Error;
 
     #[inline]
@@ -20,7 +21,7 @@ impl<E: Encoder> Encodable<E> for u8 {
     }
 }
 
-impl<E: Encoder> Encodable<E> for i8 {
+impl<E: ByteEncoder> Encodable<E> for i8 {
     type Error = E::Error;
 
     #[inline]
@@ -32,7 +33,7 @@ impl<E: Encoder> Encodable<E> for i8 {
 
 impl<Encoder> crate::Encodable<Encoder> for bool
 where
-    Encoder: crate::Encoder,
+    Encoder: crate::ByteEncoder,
 {
     type Error = Encoder::Error;
 
@@ -45,7 +46,7 @@ where
 impl<T, Encoder> crate::Encodable<Encoder> for &T
 where
     T: crate::Encodable<Encoder> + ?Sized,
-    Encoder: crate::Encoder,
+    Encoder: crate::BaseEncoder,
 {
     type Error = T::Error;
 

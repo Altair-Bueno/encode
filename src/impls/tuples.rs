@@ -1,6 +1,6 @@
 #![allow(unused_variables)]
+use crate::BaseEncoder;
 use crate::Encodable;
-use crate::Encoder;
 
 // https://users.rust-lang.org/t/macro-to-impl-trait-for-tuple/79165/3
 macro_rules! impl_encodable_for_tuple {
@@ -8,7 +8,7 @@ macro_rules! impl_encodable_for_tuple {
         paste::paste! {
             impl<ENC, A, $($T,)*> Encodable<ENC> for (A,$($T,)*)
             where
-                ENC: Encoder,
+                ENC: BaseEncoder,
                 A: Encodable<ENC>,
                 $($T: Encodable<ENC, Error = A::Error>,)*
             {
@@ -53,7 +53,7 @@ impl_encodable_for_tuple!(B C);
 impl_encodable_for_tuple!(B);
 impl_encodable_for_tuple!();
 
-impl<E: Encoder> Encodable<E> for () {
+impl<E: BaseEncoder> Encodable<E> for () {
     type Error = E::Error;
 
     #[inline]

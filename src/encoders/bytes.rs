@@ -1,11 +1,14 @@
 use bytes::BufMut;
 use bytes::BytesMut;
 
-use crate::Encoder;
+use crate::BaseEncoder;
+use crate::ByteEncoder;
 
-impl Encoder for BytesMut {
+impl BaseEncoder for BytesMut {
     type Error = core::convert::Infallible;
+}
 
+impl ByteEncoder for BytesMut {
     fn put_slice(&mut self, slice: &[u8]) -> Result<(), Self::Error> {
         BufMut::put_slice(self, slice);
         Ok(())

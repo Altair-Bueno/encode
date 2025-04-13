@@ -2,8 +2,8 @@ use core::borrow::Borrow;
 use core::num::NonZero;
 use core::ops::Deref;
 
+use crate::ByteEncoder;
 use crate::Encodable;
-use crate::Encoder;
 
 /// Encodes a number in big-endian order.
 ///
@@ -73,7 +73,7 @@ macro_rules! impl_encodeable_be_for_num {
                     be.num
                 }
             }
-            impl<E: Encoder> Encodable<E> for BE<$T>
+            impl<E: ByteEncoder> Encodable<E> for BE<$T>
             {
                 type Error = E::Error;
 
@@ -100,7 +100,7 @@ macro_rules! impl_encodeable_be_for_nonzero_num {
                     be.num
                 }
             }
-            impl<E: Encoder> Encodable<E> for BE<NonZero<$T>>
+            impl<E: ByteEncoder> Encodable<E> for BE<NonZero<$T>>
             {
                 type Error = E::Error;
 

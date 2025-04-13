@@ -1,7 +1,8 @@
 //! A [BSON](https://bsonspec.org/spec.html) encoder
 //!
 //! This example demonstrates how to implement [`Encodable`] with custom
-//! errors, and how combinators can be used to simplify the implementation of encoders.
+//! errors, and how combinators can be used to simplify the implementation of
+//! encoders.
 //!
 //! Run the example with:
 //!
@@ -64,7 +65,7 @@ pub struct BsonDocument {
 
 impl<Encoder> Encodable<Encoder> for BsonDocument
 where
-    Encoder: encode::Encoder,
+    Encoder: encode::ByteEncoder,
     BsonError: From<Encoder::Error>,
 {
     type Error = BsonError;
@@ -120,7 +121,7 @@ pub enum BsonElementVariant {
 
 impl<Encoder> Encodable<Encoder> for BsonElement
 where
-    Encoder: encode::Encoder,
+    Encoder: encode::ByteEncoder,
     BsonError: From<Encoder::Error>,
 {
     type Error = BsonError;
@@ -193,7 +194,7 @@ struct BsonString<S>(S);
 impl<S, Encoder> Encodable<Encoder> for BsonString<S>
 where
     S: AsRef<str>,
-    Encoder: encode::Encoder,
+    Encoder: encode::ByteEncoder,
     BsonError: From<Encoder::Error>,
 {
     type Error = BsonError;
@@ -238,7 +239,8 @@ fn main() -> Result<(), BsonError> {
     let size = document.encoded_size()?;
     println!("Expected BSON size: {}", size);
 
-    // We can also encode the JSON string into a buffer, like a Vec<u8> or &mut [u8].
+    // We can also encode the JSON string into a buffer, like a Vec<u8> or &mut
+    // [u8].
     let mut buf = Vec::with_capacity(size);
     document.encode(&mut buf)?;
 

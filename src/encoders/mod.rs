@@ -9,13 +9,24 @@
 //! - [`()`](unit): does nothing when encoding. Useful for testing.
 //! - [`SizeEncoder`]: counts the number of bytes written.
 //! - [`&mut [u8]`](slice): writes bytes into a slice, if there is enough space.
+//! - [`Formatter`](core::fmt::Formatter): writes the encoded data into a
+//!   formatter. Useful for implementing traits like
+//!   [`Display`](core::fmt::Display) or [`Debug`](core::fmt::Debug).
 #![cfg_attr(
     feature = "alloc",
     doc = "- [`Vec<u8>`] (`std` or `alloc` feature): writes bytes into a vector that grows if necessary."
 )]
 #![cfg_attr(
+    feature = "alloc",
+    doc = "- [`String`] (`std` or `alloc` feature): writes UTF-8 data into a string that grows if necessary."
+)]
+#![cfg_attr(
     feature = "arrayvec",
     doc = "- [`ArrayVec`](::arrayvec::ArrayVec) (`arrayvec` feature): writes bytes into an ArrayVec, if there is enough space."
+)]
+#![cfg_attr(
+    feature = "arrayvec",
+    doc = "- [`ArrayString`](::arrayvec::ArrayString) (`arrayvec` feature): writes UTF-8 data into an ArrayString, if there is enough space."
 )]
 #![cfg_attr(
     feature = "bytes",
@@ -28,15 +39,18 @@ mod arrayvec;
 #[cfg(feature = "bytes")]
 mod bytes;
 mod errors;
+mod fmt;
 mod size;
 mod slices;
 
 pub use errors::InsufficientSpace;
 pub use size::SizeEncoder;
 
-impl crate::Encoder for () {
+impl crate::BaseEncoder for () {
     type Error = core::convert::Infallible;
+}
 
+impl crate::ByteEncoder for () {
     #[inline]
     fn put_slice(&mut self, _: &[u8]) -> Result<(), Self::Error> {
         Ok(())
