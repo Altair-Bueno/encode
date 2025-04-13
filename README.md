@@ -40,7 +40,8 @@ crate.
 - `default`: Enables the `std` feature.
 - `std`: Enables the use of the standard library.
 - `alloc`: Enables the use of the `alloc` crate.
-- `arrayvec`: Implements [`ByteEncoder`] for [`arrayvec::ArrayVec`] and [`StrEncoder`] for [`arrayvec::ArrayString`].
+- `arrayvec`: Implements [`ByteEncoder`] for [`arrayvec::ArrayVec`] and
+  [`StrEncoder`] for [`arrayvec::ArrayString`].
 - `bytes`: Implements [`ByteEncoder`] for [`bytes::BytesMut`].
 
 ## FAQs
@@ -88,10 +89,8 @@ the error type is limited on what it can do:
 
 ### [`BaseEncoder`] vs [`ByteEncoder`] vs [`StrEncoder`]
 
-- [`BaseEncoder`] is the base trait for all encoders. It defines the
-  basic operations that all encoders must implement. Should be used to build
-  combinators.
-- [`StrEncoder`] is a trait for encoders that can handle UTF-8 strings. If your encodables only
-  require StrEncoder, you can use [`BaseEncoder`] as a trait object. This is the
-- [`ByteEncoder`] is a trait for encoders that can handle raw bytes. All [`ByteEncoder`]s implement
-  [`BaseEncoder`] and [`StrEncoder`], but are unable to produce UTF-8 strings.
+| Trait           | Supports Strings | Supports Raw Bytes | Use Case                                                      |
+| --------------- | ---------------- | ------------------ | ------------------------------------------------------------- |
+| [`BaseEncoder`] | 🚫               | 🚫                 | Abstraction and trait bounds. Useful for building combinators |
+| [`StrEncoder`]  | ✅               | 🚫                 | Supports only UTF-8 text output                               |
+| [`ByteEncoder`] | ✅               | ✅                 | Full control, raw binary output                               |
