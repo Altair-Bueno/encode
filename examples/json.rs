@@ -83,7 +83,7 @@ impl<E: StrEncoder> Encodable<E> for Json {
 
 // Notice how we can use our encoder to implement traits such as `Display`.
 //
-// Pretty printing could be archived by dispatching to a different encoder if
+// Pretty printing could be achieved by dispatching to a different encoder if
 // `f.alternative()` is true.
 impl std::fmt::Display for Json {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
