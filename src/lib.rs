@@ -22,8 +22,8 @@
 extern crate alloc;
 
 pub mod combinators;
+mod encodables;
 pub mod encoders;
-mod impls;
 
 /// A trait for types that can be encoded into a specific encoder.
 ///
