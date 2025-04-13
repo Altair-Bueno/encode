@@ -18,6 +18,7 @@ impl StrEncoder for Formatter<'_> {
 mod tests {
     use super::*;
     use crate::Encodable;
+    use alloc::string::String;
     use core::fmt::Write;
 
     #[test]
