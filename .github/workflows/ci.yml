@@ -122,3 +122,18 @@ jobs:
         uses: codecov/codecov-action@v5
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+  ci-check:
+    name: Check all statuses are green
+    if: always()
+    needs:
+      - typos-cli
+      - taplo-toml-fmt
+      - prettier-fmt
+      - rust-checks
+      - coverage
+    runs-on: ubuntu-latest
+    steps:
+      - name: Decide whether the needed jobs succeeded or failed
+        uses: re-actors/alls-green@v1.2.2
+        with:
+          jobs: ${{ toJSON(needs) }}
