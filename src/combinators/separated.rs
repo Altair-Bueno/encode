@@ -1,4 +1,4 @@
-/// A combinator that encodes an iterator of encodables as a sequence with separators.
+/// Encodes a sequence of encodables separated by a given delimiter.
 ///
 /// # Example
 ///
@@ -42,7 +42,7 @@ where
     EncodableIter: IntoIterator + Clone,
     EncodableIter::Item: crate::Encodable<Encoder, Error = Separator::Error>,
     Separator: crate::Encodable<Encoder>,
-    Encoder: crate::Encoder,
+    Encoder: crate::BaseEncoder,
 {
     type Error = Separator::Error;
 

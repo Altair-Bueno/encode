@@ -1,9 +1,14 @@
-use crate::Encoder;
+use crate::BaseEncoder;
+use crate::ByteEncoder;
+use crate::StrEncoder;
+use alloc::string::String;
 use alloc::vec::Vec;
 
-impl Encoder for Vec<u8> {
+impl BaseEncoder for Vec<u8> {
     type Error = core::convert::Infallible;
+}
 
+impl ByteEncoder for Vec<u8> {
     fn put_slice(&mut self, slice: &[u8]) -> Result<(), Self::Error> {
         self.extend(slice);
         Ok(())
@@ -15,15 +20,39 @@ impl Encoder for Vec<u8> {
     }
 }
 
+impl BaseEncoder for String {
+    type Error = core::convert::Infallible;
+}
+
+impl StrEncoder for String {
+    fn put_str(&mut self, string: &str) -> Result<(), Self::Error> {
+        self.push_str(string);
+        Ok(())
+    }
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
+    use crate::Encodable;
 
     #[test]
     fn assert_that_vec_grows() {
         let mut buf = Vec::with_capacity(1);
         let encodable = b"hello";
-        buf.put_slice(encodable).unwrap();
+
+        encodable.encode(&mut buf).unwrap();
+
         assert_eq!(buf, b"hello", "The vector grows as necessary");
+    }
+
+    #[test]
+    fn assert_that_string_grows() {
+        let mut buf = String::with_capacity(1);
+        let encodable = "hello";
+
+        encodable.encode(&mut buf).unwrap();
+
+        assert_eq!(buf, "hello", "The string grows as necessary");
     }
 }

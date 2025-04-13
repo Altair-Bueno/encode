@@ -1,7 +1,7 @@
 use core::borrow::Borrow;
 use core::ops::Deref;
 
-/// Conditionally encodes an encodable.
+///  Encodes a value only if a condition is met
 ///
 /// # Examples
 ///
@@ -73,7 +73,7 @@ impl<E, F> Deref for Cond<E, F> {
 impl<Encodable, Encoder, F> crate::Encodable<Encoder> for Cond<Encodable, F>
 where
     Encodable: crate::Encodable<Encoder>,
-    Encoder: crate::Encoder,
+    Encoder: crate::BaseEncoder,
     F: Fn(&Encodable) -> bool,
 {
     type Error = Encodable::Error;

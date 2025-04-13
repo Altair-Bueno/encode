@@ -1,10 +1,10 @@
+use crate::BaseEncoder;
 use crate::Encodable;
-use crate::Encoder;
 
 impl<T, E> Encodable<E> for Option<T>
 where
     T: Encodable<E>,
-    E: Encoder,
+    E: BaseEncoder,
 {
     type Error = T::Error;
 
@@ -19,7 +19,7 @@ where
 impl<T, E> Encodable<E> for Result<T, T::Error>
 where
     T: Encodable<E>,
-    E: Encoder,
+    E: BaseEncoder,
     T::Error: Clone,
 {
     type Error = T::Error;

@@ -1,11 +1,14 @@
 use bytes::BufMut;
 use bytes::BytesMut;
 
-use crate::Encoder;
+use crate::BaseEncoder;
+use crate::ByteEncoder;
 
-impl Encoder for BytesMut {
+impl BaseEncoder for BytesMut {
     type Error = core::convert::Infallible;
+}
 
+impl ByteEncoder for BytesMut {
     fn put_slice(&mut self, slice: &[u8]) -> Result<(), Self::Error> {
         BufMut::put_slice(self, slice);
         Ok(())
@@ -26,12 +29,12 @@ mod tests {
     #[test]
     fn assert_that_bytesmut_can_be_used_as_encoder() {
         let mut buf = BytesMut::new();
-        let encodable = "hello";
+        let encodable = ("hello", 0u8);
 
         encodable.encode(&mut buf).unwrap();
         let bytes = buf.freeze();
 
-        assert_eq!(bytes.len(), 5, "The buffer should contain 5 bytes");
-        assert_eq!(bytes, b"hello"[..]);
+        assert_eq!(bytes.len(), 6, "The buffer should contain 5 bytes");
+        assert_eq!(bytes, b"hello\0"[..]);
     }
 }

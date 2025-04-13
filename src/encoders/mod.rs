@@ -1,26 +1,45 @@
-//! Encoders for encoding data into byte slices.
+//! Encoders for gathering encoded data into various output types.
 //!
-//! This module contains different types that implement the [`Encoder`] trait.
-//! As a summary, these types implement the [`Encodable`] trait:
+//! [`BaseEncoder`]: crate::BaseEncoder
+//! [`StrEncoder`]: crate::StrEncoder
+//! [`ByteEncoder`]: crate::ByteEncoder
+//! [`Display`]: core::fmt::Display
+//! [`Debug`]: core::fmt::Debug
 //!
-//! [`Encoder`]: crate::Encoder
-//! [`Encodable`]: crate::Encodable
+//! This module provides implementations of [`BaseEncoder`], [`StrEncoder`], and
+//! [`ByteEncoder`] for a variety of output types, allowing encoded data to be
+//! written into different buffer types, such as slices, strings, formatters and
+//! more.
 //!
-//! - [`()`](unit): does nothing when encoding. Useful for testing.
-//! - [`SizeEncoder`]: counts the number of bytes written.
-//! - [`&mut [u8]`](slice): writes bytes into a slice, if there is enough space.
+//! # Supported Encoder Types
+//!
+//! | Type | Description | [`BaseEncoder`] | [`StrEncoder`] | [`ByteEncoder`] | Requires feature |
+//! |------|-------------|-----------------|----------------|-----------------|------------------|
+//! | [`()`](unit) | A no-op encoder. Useful for testing combinators or skipping output. | ✅ | ✅ | ✅ | - |
+//! | [`Formatter`](core::fmt::Formatter) | Writes data into a Rust [`core::fmt::Write`]. Useful for implementing [`Display`] or [`Debug`]. | ✅ | ✅ | ❌ | - |
+//! | [`SizeEncoder`] | Counts how many bytes would be encoded. Useful for sizing buffers. | ✅ | ✅ | ✅ | - |
+//! | [`&mut [u8]`](slice) | Writes bytes into a fixed-size mutable slice. Fails if full. | ✅ | ✅ | ✅ | - |
 #![cfg_attr(
     feature = "alloc",
-    doc = "- [`Vec<u8>`] (`std` or `alloc` feature): writes bytes into a vector that grows if necessary."
+    doc = "| [`Vec<u8>`](::alloc::vec::Vec) | Dynamically growing encoder that appends to a `Vec<u8>`. | ✅ | ✅ | ✅ | `alloc` OR `std` |"
+)]
+#![cfg_attr(
+    feature = "alloc",
+    doc = "| [`String`](::alloc::string::String) | Appends UTF-8 strings to a dynamically growing `String`. | ✅ | ✅ | ❌ | `alloc` OR `std` |"
 )]
 #![cfg_attr(
     feature = "arrayvec",
-    doc = "- [`ArrayVec`](::arrayvec::ArrayVec) (`arrayvec` feature): writes bytes into an ArrayVec, if there is enough space."
+    doc = "| [`ArrayVec`](::arrayvec::ArrayVec) | Encodes into a fixed-capacity `ArrayVec<u8, N>`. Fails if full. | ✅ | ✅ | ✅ | `arrayvec` |"
+)]
+#![cfg_attr(
+    feature = "arrayvec",
+    doc = "| [`ArrayString`](::arrayvec::ArrayString) | Encodes UTF-8 strings into a fixed-capacity `ArrayString`. Fails if full. | ✅ | ✅ | ❌ | `arrayvec` |"
 )]
 #![cfg_attr(
     feature = "bytes",
-    doc = "- [`BufMut`](::bytes::BufMut) (`bytes` feature): writes bytes into an BufMut. Note that encoding will be more efficient if the BufMut is already pre-allocated."
+    doc = "| [`BufMut`](::bytes::BufMut) | Writes to any `BufMut` (e.g., from `bytes` crate). Note that preallocating the buffer improves performance. | ✅ | ✅ | ✅ | `bytes` |"
 )]
+
 #[cfg(feature = "alloc")]
 mod alloc;
 #[cfg(feature = "arrayvec")]
@@ -28,22 +47,10 @@ mod arrayvec;
 #[cfg(feature = "bytes")]
 mod bytes;
 mod errors;
+mod fmt;
+mod primitives;
 mod size;
 mod slices;
 
 pub use errors::InsufficientSpace;
 pub use size::SizeEncoder;
-
-impl crate::Encoder for () {
-    type Error = core::convert::Infallible;
-
-    #[inline]
-    fn put_slice(&mut self, _: &[u8]) -> Result<(), Self::Error> {
-        Ok(())
-    }
-
-    #[inline]
-    fn put_byte(&mut self, _: u8) -> Result<(), Self::Error> {
-        Ok(())
-    }
-}

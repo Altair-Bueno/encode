@@ -1,10 +1,10 @@
 use core::fmt::Debug;
 use core::ops::Deref;
 
+use crate::ByteEncoder;
 use crate::Encodable;
-use crate::Encoder;
 
-/// A combinator that encodes a sequence of flags as a single byte.
+/// Encodes a set of bit flags packed into a single byte
 ///
 /// # Examples
 ///
@@ -94,7 +94,7 @@ impl From<Flags> for u8 {
     }
 }
 
-impl<E: Encoder> Encodable<E> for Flags {
+impl<E: ByteEncoder> Encodable<E> for Flags {
     type Error = E::Error;
 
     #[inline]

@@ -3,7 +3,7 @@ use core::fmt::Debug;
 use core::marker::PhantomData;
 use core::ops::Deref;
 
-/// A combinator that transforms the error type of an encodable.
+/// Transforms the error type of an encodable.
 ///
 /// This combinator is useful when you want to encode an encodable that has an
 /// error type that is not compatible with another encodable.
@@ -66,7 +66,7 @@ impl<Encodable, Encoder, DstError> crate::Encodable<Encoder> for FromError<Encod
 where
     DstError: From<Encodable::Error> + From<Encoder::Error>,
     Encodable: crate::Encodable<Encoder>,
-    Encoder: crate::Encoder,
+    Encoder: crate::BaseEncoder,
 {
     type Error = DstError;
 

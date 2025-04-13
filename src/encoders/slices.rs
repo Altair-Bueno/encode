@@ -1,9 +1,12 @@
 use super::InsufficientSpace;
-use crate::Encoder;
+use crate::BaseEncoder;
+use crate::ByteEncoder;
 
-impl Encoder for &mut [u8] {
+impl BaseEncoder for &mut [u8] {
     type Error = InsufficientSpace;
+}
 
+impl ByteEncoder for &mut [u8] {
     #[inline]
     fn put_slice(&mut self, slice: &[u8]) -> Result<(), Self::Error> {
         let (a, b) = core::mem::take(self)

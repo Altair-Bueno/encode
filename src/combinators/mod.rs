@@ -1,47 +1,61 @@
-//! Combinators for composing encodables.
+//! Combinators for composing and building complex encodables.
 //!
-//! This module contains a number of combinators that can be used to compose
-//! encodables. The objective is to provide a set of building blocks that can be
-//! combined to create more complex encodables that can be encoded into byte
-//! sequences.
+//! [`Encodable`]: crate::Encodable
 //!
-//! # Available encodables
+//! This module provides utility types for building complex [`Encodable`]
+//! types from simpler ones. These combinators allow common operations for
+//! encoding values, such as conditional encoding, prefixes or custom byte
+//! ordering.
 //!
-//! ## Basic encodables
+//! These building blocks follow the [`Encodable`] trait interface and can be
+//! nested or chained together to define rich encoding behavior with minimal
+//! boilerplate.
 //!
-//! | Type | Description |
-//! |------------|-------------|
-//! | [`(...)`](tuple) | Encodes all encodables in sequence |
-//! | [i8], [u8] | Encodes a single byte |
-//! | [`char`] | Encodes the character as a UTF-8 byte sequence |
-//! | [`&str`](str) | Encodes a string as a UTF-8 byte sequence |
-//! | [`&CStr`](core::ffi::CStr) | Encodes a string as a byte sequence with a null terminator (`\0`) |
-//! | [`&[u8]`](slice) | Encodes a slice of bytes |
-//! | [`Arguments`](core::fmt::Arguments)([`format_args!`])| Runs [`core::fmt`](`core::fmt`) machinery and encodes the result, without allocations |
+//! # Categories of Encodables
 //!
-//! ## Encodable combinators
+//! ## Primitive and Built-in Encodables
+//!
+//! These are the basic types that can be directly encoded.
 //!
 //! | Type | Description |
-//! |------------|-------------|
-//! | [`Option`] | Encodes `T` if `Some`, or does nothing on `None` |
-//! | [`Result`] | Encodes `T` if [`Ok`], or bubbles up `E` on [`Err`] |
-//! | [`Cond`] | Conditionally encodes an encodable if the given predicate is true |
-//! | [`Flags`] | Encodes a set of bit flags as a byte |
-//! | [`LE`] | Encodes a number in little-endian order. |
-//! | [`BE`] | Encodes a number in big-endian order. |
-//! | [`Separated`] | Encodes a sequence of encodables separated by a delimiter. |
-//! | [`LengthPrefix`] | Encodes a value after its size. |
-//! | [`Iter`] | Encodes an iterator of encodables as a sequence. |
+//! |------|-------------|
+//! | [`(...)`](tuple) | Encodes a tuple by encoding each element in order |
+//! | [`i8`] and [`u8`] | Encodes a single byte |
+//! | [`char`] | Encodes a character as its UTF-8 byte representation |
+//! | [`&str`](str) | Encodes a UTF-8 string |
+//! | [`&CStr`](core::ffi::CStr) | Encodes a C string, including the null terminator (`\0`) |
+//! | [`&[u8]`](slice) | Encodes a byte slice |
+//! | [`Arguments`](core::fmt::Arguments) | Encodes formatted data from [`format_args!]` with zero allocations |
+//!
+//! ## Composition and Flow Combinators
+//!
+//! These types wrap or transform other encodables, allowing conditional
+//! encoding, iteration, or control over the format and structure of the output.
+//!
+//! | Type | Description |
+//! |------|-------------|
+//! | [`Option`] | Encodes the inner value if `Some`; does nothing if `None` |
+//! | [`Result`] | Encodes the value on [`Ok`]; returns the error on [`Err`] |
+//! | [`Cond`] | Encodes a value only if a condition is met |
+//! | [`Flags`] | Encodes a set of bit flags packed into a single byte |
+//! | [`LE`] | Encodes a number in little-endian order |
+//! | [`BE`] | Encodes a number in big-endian order |
+//! | [`LengthPrefix`] | Encodes a length prefixed value ([TLV](https://en.wikipedia.org/wiki/Type–length–value)) |
+//! | [`Separated`] | Encodes a sequence of encodables separated by a given delimiter |
+//! | [`Iter`] | Encodes a sequence of encodables |
+//! | [`FromError`] | Transforms the error type of an encodable. |
 #![cfg_attr(
     feature = "alloc",
-    doc = r"## alloc encodables (requires `alloc` feature)
+    doc = r"## Alloc Encodables (requires the `alloc` OR `std` features)
 
-|         Type|                                                       Description |
-|-------------|-------------------------------------------------------------------|
-| [`Vec<u8>`] | Encodes a vector of bytes                                         |
-| [`String`]  | Encodes a string as a UTF-8 byte sequence                         |
-| [`CString`](std::ffi::CString) | Encodes a string as a byte sequence with a null terminator (`\0`) |
-| [`Box`]     | Encodes a boxed value                                             |
+These types are supported when the `alloc` or `std` feature is enabled.
+
+| Type | Description |
+|------|-------------|
+| [`Vec<u8>`] | Encodes a byte vector as a contiguous sequence of bytes |
+| [`String`] | Encodes a heap-allocated UTF-8 string |
+| [`CString`](std::ffi::CString) | Encodes a C-style string including the null terminator (`\0`) |
+| [`Box<T>`] | Encodes the value pointed to by a `Box`, as if it were directly encoded |
 "
 )]
 

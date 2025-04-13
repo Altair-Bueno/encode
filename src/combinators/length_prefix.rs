@@ -73,7 +73,7 @@ impl<Encodable, Length, Error> Borrow<Encodable> for LengthPrefix<Encodable, Len
 impl<Encodable, Length, Encoder, Error> crate::Encodable<Encoder>
     for LengthPrefix<Encodable, Length, Error>
 where
-    Encoder: crate::Encoder,
+    Encoder: crate::BaseEncoder,
     Encodable: crate::Encodable<Encoder> + crate::EncodableSize,
     Length: crate::Encodable<Encoder> + TryFrom<usize>,
     Error: From<<Length as crate::Encodable<Encoder>>::Error>

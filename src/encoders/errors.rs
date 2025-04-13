@@ -1,9 +1,9 @@
-/// An error that occurs when the provided buffer has no space left for encoding.
+/// An error that occurs when the provided buffer has no space left for
+/// encoding.
 ///
-/// This error is returned by the [`Encoder`] implementation of mutable slices
-/// ([`&mut [u8]`](slice)) when there is no space left in the buffer.
-///
-/// [`Encoder`]: crate::Encoder
+/// This error is returned by encoders with a fixed size buffer that cannot
+/// grow, such as [`&mut [u8]`](slice), [`ArrayVec`](arrayvec::ArrayVec) or
+/// [`ArrayString`](arrayvec::ArrayString).
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub struct InsufficientSpace;
 

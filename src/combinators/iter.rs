@@ -1,7 +1,7 @@
 use core::borrow::Borrow;
 use core::ops::Deref;
 
-/// A combinator that encodes an iterator of encodables as a sequence.
+/// Encodes a sequence of encodables.
 ///
 /// # Example
 ///
@@ -65,7 +65,7 @@ impl<EncodableIter, Encoder> crate::Encodable<Encoder> for Iter<EncodableIter>
 where
     EncodableIter: IntoIterator + Clone,
     EncodableIter::Item: crate::Encodable<Encoder>,
-    Encoder: crate::Encoder,
+    Encoder: crate::BaseEncoder,
 {
     type Error = <EncodableIter::Item as crate::Encodable<Encoder>>::Error;
 

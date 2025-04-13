@@ -2,8 +2,8 @@ use core::borrow::Borrow;
 use core::num::NonZero;
 use core::ops::Deref;
 
+use crate::ByteEncoder;
 use crate::Encodable;
-use crate::Encoder;
 
 /// Encodes a number in little-endian order.
 ///
@@ -73,7 +73,7 @@ macro_rules! impl_encodeable_le_for_num {
                     le.num
                 }
             }
-            impl<E: Encoder> Encodable<E> for LE<$T>
+            impl<E: ByteEncoder> Encodable<E> for LE<$T>
             {
                 type Error = E::Error;
 
@@ -100,7 +100,7 @@ macro_rules! impl_encodeable_le_for_nonzero_num {
                     le.num
                 }
             }
-            impl<E: Encoder> Encodable<E> for LE<NonZero<$T>>
+            impl<E: ByteEncoder> Encodable<E> for LE<NonZero<$T>>
             {
                 type Error = E::Error;
 

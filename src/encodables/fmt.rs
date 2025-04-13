@@ -2,14 +2,14 @@ use core::fmt::Arguments;
 use core::fmt::Write;
 
 use crate::Encodable;
-use crate::Encoder;
+use crate::StrEncoder;
 
 struct Adapter<'a, AEncoder, AError> {
     encoder: &'a mut AEncoder,
     error: Option<AError>,
 }
 
-impl<AEncoder: Encoder> Write for Adapter<'_, AEncoder, AEncoder::Error> {
+impl<AEncoder: StrEncoder> Write for Adapter<'_, AEncoder, AEncoder::Error> {
     #[inline]
     fn write_str(&mut self, s: &str) -> core::fmt::Result {
         match s.encode(self.encoder) {
@@ -22,7 +22,7 @@ impl<AEncoder: Encoder> Write for Adapter<'_, AEncoder, AEncoder::Error> {
     }
 }
 
-impl<E: Encoder> Encodable<E> for Arguments<'_> {
+impl<E: StrEncoder> Encodable<E> for Arguments<'_> {
     type Error = E::Error;
 
     #[inline]
