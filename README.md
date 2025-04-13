@@ -89,8 +89,9 @@ the error type is limited on what it can do:
 
 ### [`BaseEncoder`] vs [`ByteEncoder`] vs [`StrEncoder`]
 
-| Trait           | Supports Strings | Supports Raw Bytes | Use Case                                                      |
-| --------------- | ---------------- | ------------------ | ------------------------------------------------------------- |
-| [`BaseEncoder`] | 🚫               | 🚫                 | Abstraction and trait bounds. Useful for building combinators |
-| [`StrEncoder`]  | ✅               | 🚫                 | Supports only UTF-8 text output                               |
-| [`ByteEncoder`] | ✅               | ✅                 | Full control, raw binary output                               |
+- [`BaseEncoder`]: Provides abstraction and trait bounds. It is useful for
+  building combinators that can work with any type of encoder.
+- [`StrEncoder`]: Provides a simple interface for encoding UTF-8 text. It is
+  suitable for UTF-8 text output.
+- [`ByteEncoder`]: Provides full control over the encoding process. It is
+  suitable for low-level encoding tasks, such as writing raw bytes to a buffer.
