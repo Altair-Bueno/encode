@@ -34,12 +34,25 @@ impl StrEncoder for String {
 #[cfg(test)]
 mod test {
     use super::*;
+    use crate::Encodable;
 
     #[test]
     fn assert_that_vec_grows() {
         let mut buf = Vec::with_capacity(1);
         let encodable = b"hello";
-        buf.put_slice(encodable).unwrap();
+
+        encodable.encode(&mut buf).unwrap();
+
         assert_eq!(buf, b"hello", "The vector grows as necessary");
+    }
+
+    #[test]
+    fn assert_that_string_grows() {
+        let mut buf = String::with_capacity(1);
+        let encodable = "hello";
+
+        encodable.encode(&mut buf).unwrap();
+
+        assert_eq!(buf, "hello", "The string grows as necessary");
     }
 }
