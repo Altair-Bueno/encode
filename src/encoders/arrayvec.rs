@@ -36,8 +36,8 @@ impl<const SIZE: usize> StrEncoder for ArrayString<SIZE> {
 
 #[cfg(test)]
 mod test {
+    use super::*;
     use crate::Encodable;
-    use arrayvec::ArrayVec;
 
     #[test]
     fn assert_that_encoding_something_into_an_empty_arrayvec_always_fails() {
@@ -50,7 +50,7 @@ mod test {
     }
 
     #[test]
-    fn assert_that_slices_can_be_used_as_encoders() {
+    fn assert_that_arrayvecs_can_be_used_as_encoders() {
         let mut buf = ArrayVec::<u8, 64>::new();
         let encodable = "hello";
 
@@ -60,6 +60,21 @@ mod test {
         assert_eq!(
             buf.as_slice(),
             b"hello",
+            "The buffer should contain the encoded string"
+        );
+    }
+
+    #[test]
+    fn assert_that_arraystrings_can_be_used_as_str_encoders() {
+        let mut buf = ArrayString::<64>::new();
+        let encodable = "hello";
+
+        encodable.encode(&mut buf).unwrap();
+
+        assert_eq!(buf.len(), 5, "The buffer should contain 5 bytes");
+        assert_eq!(
+            buf.as_str(),
+            "hello",
             "The buffer should contain the encoded string"
         );
     }
