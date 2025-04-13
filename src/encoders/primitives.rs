@@ -17,3 +17,15 @@ impl ByteEncoder for () {
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::Encodable;
+
+    #[test]
+    fn assert_that_unit_can_be_used_as_an_encoder() {
+        let mut encoder = ();
+        let encodable = ("hello", 0u8);
+        encodable.encode(&mut encoder).unwrap();
+    }
+}
