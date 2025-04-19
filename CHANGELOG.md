@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.4](https://github.com/Altair-Bueno/encode/compare/v0.2.3...v0.2.4) - 2025-04-19
+
+### Added
+
+- Added IoEncoder to adapt std::io::Write ([#24](https://github.com/Altair-Bueno/encode/pull/24))
+
 ## [0.2.3](https://github.com/Altair-Bueno/encode/compare/v0.2.2...v0.2.3) - 2025-04-19
 
 ### Added
