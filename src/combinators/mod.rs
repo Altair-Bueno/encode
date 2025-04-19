@@ -22,10 +22,12 @@
 //! | [`(...)`](tuple) | Encodes a tuple by encoding each element in order |
 //! | [`i8`] and [`u8`] | Encodes a single byte |
 //! | [`char`] | Encodes a character as its UTF-8 byte representation |
-//! | [`&str`](str) | Encodes a UTF-8 string |
-//! | [`&CStr`](core::ffi::CStr) | Encodes a C string, including the null terminator (`\0`) |
-//! | [`&[u8]`](slice) | Encodes a byte slice |
-//! | [`Arguments`](core::fmt::Arguments) | Encodes formatted data from [`format_args!]` with zero allocations |
+//! | [`str`] | Encodes a UTF-8 string slice |
+//! | [`CStr`](core::ffi::CStr) | Encodes a C string slice, including the null terminator (`\0`) |
+//! | [`[u8; N]`](array) | Encodes a byte array |
+//! | [`[u8]`](slice) | Encodes a byte slice |
+//! | [`[bool; 8]`](array) | Encodes a set of flags as a single byte |
+//! | [`Arguments`](core::fmt::Arguments) | Encodes formatted data from [`format_args]` with zero allocations |
 //!
 //! ## Composition and Flow Combinators
 //!
@@ -37,7 +39,6 @@
 //! | [`Option`] | Encodes the inner value if `Some`; does nothing if `None` |
 //! | [`Result`] | Encodes the value on [`Ok`]; returns the error on [`Err`] |
 //! | [`Cond`] | Encodes a value only if a condition is met |
-//! | [`Flags`] | Encodes a set of bit flags packed into a single byte |
 //! | [`LE`] | Encodes a number in little-endian order |
 //! | [`BE`] | Encodes a number in big-endian order |
 //! | [`LengthPrefix`] | Encodes a length prefixed value ([TLV](https://en.wikipedia.org/wiki/Type–length–value)) |
@@ -93,6 +94,7 @@ mod separated;
 
 pub use be::BE;
 pub use cond::Cond;
+#[allow(deprecated)]
 pub use flags::Flags;
 pub use from_error::FromError;
 pub use iter::Iter;
