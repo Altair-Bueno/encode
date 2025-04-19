@@ -1,3 +1,5 @@
+#![allow(deprecated)]
+
 use core::fmt::Debug;
 use core::ops::Deref;
 
@@ -31,6 +33,7 @@ use crate::Encodable;
 /// ```
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 #[repr(transparent)]
+#[deprecated(since = "0.3.0", note = "Use `[bool; 8]` directly instead")]
 pub struct Flags([bool; 8]);
 
 impl Flags {
