@@ -28,6 +28,10 @@
     doc = "| [`String`](::alloc::string::String) | Appends UTF-8 strings to a dynamically growing `String`. | ✅ | ✅ | ❌ | `alloc` OR `std` |"
 )]
 #![cfg_attr(
+    feature = "std",
+    doc = "| [`IoEncoder`] | Allows to use any [`std::io::Write`] implementor as an encoder. | ✅ | ✅ | ✅ | `std` |"
+)]
+#![cfg_attr(
     feature = "arrayvec",
     doc = "| [`ArrayVec`](::arrayvec::ArrayVec) | Encodes into a fixed-capacity `ArrayVec<u8, N>`. Fails if full. | ✅ | ✅ | ✅ | `arrayvec` |"
 )]
@@ -51,6 +55,10 @@ mod fmt;
 mod primitives;
 mod size;
 mod slices;
+#[cfg(feature = "std")]
+mod std_io;
 
 pub use errors::InsufficientSpace;
 pub use size::SizeEncoder;
+#[cfg(feature = "std")]
+pub use std_io::IoEncoder;
