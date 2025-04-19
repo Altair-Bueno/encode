@@ -14,7 +14,7 @@ use std::io::Write;
 /// use encode::encoders::IoEncoder;
 ///
 /// let mut encoder = IoEncoder(std::io::stdout().lock());
-/// b"hello, world!".encode(&mut encoder).unwrap();
+/// (b"hello, world!", 0u8).encode(&mut encoder).unwrap();
 /// ```
 #[repr(transparent)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Default, PartialOrd, Ord)]
