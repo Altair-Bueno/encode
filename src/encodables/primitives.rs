@@ -2,6 +2,21 @@ use crate::ByteEncoder;
 use crate::Encodable;
 use crate::StrEncoder;
 
+impl<E: ByteEncoder> Encodable<E> for [bool; 8] {
+    type Error = E::Error;
+
+    #[inline]
+    fn encode(&self, encoder: &mut E) -> Result<(), Self::Error> {
+        let byte = self
+            .into_iter()
+            .rev()
+            .enumerate()
+            .filter_map(|(i, v)| v.then_some(1 << i))
+            .fold(0u8, core::ops::BitOr::bitor);
+        byte.encode(encoder)
+    }
+}
+
 impl<E: StrEncoder> Encodable<E> for char {
     type Error = E::Error;
 
@@ -61,6 +76,20 @@ mod test {
     use super::*;
 
     const BUF_SIZE: usize = 64;
+
+    #[test]
+    fn assert_that_a_bool_array_can_be_encoded_as_bit_flags() {
+        let expected = [0b11010001];
+        let encodable = [true, true, false, true, false, false, false, true];
+
+        let mut buf = [0u8; BUF_SIZE];
+        let mut encoder = &mut buf as &mut [u8];
+        encodable.encode(&mut encoder).unwrap();
+        let written = BUF_SIZE - encoder.len();
+        let result = &buf[..written];
+
+        assert_eq!(expected, result);
+    }
 
     #[test]
     fn assert_that_chars_can_be_encoded() {
