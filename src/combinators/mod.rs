@@ -27,7 +27,7 @@
 //! | [`[u8; N]`](array) | Encodes a byte array |
 //! | [`[u8]`](slice) | Encodes a byte slice |
 //! | [`[bool; 8]`](array) | Encodes a set of flags as a single byte |
-//! | [`Arguments`](core::fmt::Arguments) | Encodes formatted data from [`format_args]` with zero allocations |
+//! | [`Arguments`](core::fmt::Arguments) | Encodes formatted data from [`format_args`] with zero allocations |
 //!
 //! ## Composition and Flow Combinators
 //!
