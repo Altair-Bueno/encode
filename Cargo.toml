@@ -2,7 +2,7 @@
 name = "encode"
 version = "0.2.4"
 edition = "2021"
-rust-version = "1.84.0"
+rust-version = "1.81.0"
 description = "A simple framework for encoding binary data."
 license = "MIT"
 homepage = "https://github.com/Altair-Bueno/encode"
