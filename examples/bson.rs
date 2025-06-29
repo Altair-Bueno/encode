@@ -73,7 +73,7 @@ where
     fn encode(&self, encoder: &mut Encoder) -> Result<(), Self::Error> {
         let document = (
             Iter::new(&self.e_list),
-            // u8 uses `Encoder::Error`, so we need to convert it to our BsonError
+            // u8 uses `BaseEncoder::Error`, so we need to convert it to our BsonError
             // for our combinators to work.
             FromError::<_, Self::Error>::new(0u8),
         );

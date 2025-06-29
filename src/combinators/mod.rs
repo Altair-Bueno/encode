@@ -85,7 +85,6 @@ These types are supported when the `bytes` feature is enabled.
 )]
 mod be;
 mod cond;
-mod flags;
 mod from_error;
 mod iter;
 mod le;
@@ -94,8 +93,6 @@ mod separated;
 
 pub use be::BE;
 pub use cond::Cond;
-#[allow(deprecated)]
-pub use flags::Flags;
 pub use from_error::FromError;
 pub use iter::Iter;
 pub use le::LE;
