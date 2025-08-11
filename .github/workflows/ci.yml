@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Fetch Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Install Typos
         uses: taiki-e/install-action@v2
         with:
@@ -26,7 +26,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Fetch Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Install Taplo
         uses: taiki-e/install-action@v2
         with:
@@ -38,7 +38,7 @@ jobs:
   prettier-fmt:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4 # Check out the repository first.
+      - uses: actions/checkout@v5 # Check out the repository first.
       - uses: actionsx/prettier@v3
         with:
           # prettier CLI arguments.
@@ -52,7 +52,7 @@ jobs:
       output: ${{ steps.crate-info.outputs.output }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Get crate information
         id: crate-info
         run: |
@@ -70,7 +70,7 @@ jobs:
           - ${{ fromJSON(needs.define-matrix.outputs.output).msrv }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
@@ -105,7 +105,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
         with:
