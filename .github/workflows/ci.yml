@@ -119,7 +119,7 @@ jobs:
           cargo tarpaulin --output-dir coverage --out lcov --all-features --doc
           --all-targets
       - name: Publish to Codecov
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v6
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
   ci-check:
