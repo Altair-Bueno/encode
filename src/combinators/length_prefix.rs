@@ -256,6 +256,6 @@ mod tests {
         let lp = LengthPrefix::<_, u8, TryFromIntError>::new("hello");
         let mut encoder = crate::encoders::SizeEncoder::new();
         lp.encode(&mut encoder).unwrap();
-        assert_eq!(encoder.size(), 6, "1 byte for length prefix + 5 bytes for 'hello'");
+        assert_eq!(encoder.size(), 6, "Expected 6 bytes: 1 for length prefix + 5 for \"hello\"");
     }
 }
