@@ -64,42 +64,24 @@ where
 
 #[cfg(test)]
 mod tests {
+    use rstest::rstest;
+
     use super::*;
     use crate::Encodable;
 
     const BUF_SIZE: usize = 32;
 
-    #[test]
-    fn assert_that_separated_encodes_elements_with_separator() {
-        let items: [&[u8]; 3] = [b"a", b"b", b"c"];
-        let sep = Separated::new(&items, b", " as &[u8]);
+    #[rstest]
+    #[case::multiple_elements(&[b"a" as &[u8], b"b", b"c"], b"a, b, c")]
+    #[case::single_element(&[b"only" as &[u8]], b"only")]
+    #[case::empty(&[], b"")]
+    fn assert_that_separated_encodes_correctly(#[case] items: &[&[u8]], #[case] expected: &[u8]) {
+        let sep = Separated::new(items, b", " as &[u8]);
         let mut buf = [0u8; BUF_SIZE];
         let mut encoder = &mut buf as &mut [u8];
         sep.encode(&mut encoder).unwrap();
         let written = BUF_SIZE - encoder.len();
-        assert_eq!(&buf[..written], b"a, b, c");
-    }
-
-    #[test]
-    fn assert_that_separated_with_single_element_has_no_separator() {
-        let items: [&[u8]; 1] = [b"only"];
-        let sep = Separated::new(&items, b", " as &[u8]);
-        let mut buf = [0u8; BUF_SIZE];
-        let mut encoder = &mut buf as &mut [u8];
-        sep.encode(&mut encoder).unwrap();
-        let written = BUF_SIZE - encoder.len();
-        assert_eq!(&buf[..written], b"only");
-    }
-
-    #[test]
-    fn assert_that_separated_with_empty_sequence_encodes_nothing() {
-        let items: [&[u8]; 0] = [];
-        let sep = Separated::new(&items, b", " as &[u8]);
-        let mut buf = [0u8; BUF_SIZE];
-        let mut encoder = &mut buf as &mut [u8];
-        sep.encode(&mut encoder).unwrap();
-        let written = BUF_SIZE - encoder.len();
-        assert_eq!(&buf[..written], b"");
+        assert_eq!(&buf[..written], expected);
     }
 
     #[test]

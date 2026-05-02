@@ -92,29 +92,26 @@ where
 mod tests {
     use core::borrow::Borrow;
 
+    use rstest::rstest;
+
     use super::*;
     use crate::Encodable;
 
     const BUF_SIZE: usize = 32;
 
-    #[test]
-    fn assert_that_cond_encodes_when_condition_is_true() {
-        let cond = Cond::new(1u8, |_: &u8| true);
+    #[rstest]
+    #[case::condition_met(true, &[1u8])]
+    #[case::condition_not_met(false, &[])]
+    fn assert_that_cond_encoding_respects_condition(
+        #[case] condition: bool,
+        #[case] expected: &[u8],
+    ) {
+        let cond = Cond::new(1u8, move |_: &u8| condition);
         let mut buf = [0u8; BUF_SIZE];
         let mut encoder = &mut buf as &mut [u8];
         cond.encode(&mut encoder).unwrap();
         let written = BUF_SIZE - encoder.len();
-        assert_eq!(&buf[..written], &[1u8]);
-    }
-
-    #[test]
-    fn assert_that_cond_does_not_encode_when_condition_is_false() {
-        let cond = Cond::new(1u8, |_: &u8| false);
-        let mut buf = [0u8; BUF_SIZE];
-        let mut encoder = &mut buf as &mut [u8];
-        cond.encode(&mut encoder).unwrap();
-        let written = BUF_SIZE - encoder.len();
-        assert_eq!(&buf[..written], &[]);
+        assert_eq!(&buf[..written], expected);
     }
 
     #[test]

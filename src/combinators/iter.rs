@@ -82,29 +82,23 @@ where
 mod tests {
     use core::borrow::Borrow;
 
+    use rstest::rstest;
+
     use super::*;
     use crate::Encodable;
 
     const BUF_SIZE: usize = 32;
 
-    #[test]
-    fn assert_that_iter_encodes_all_elements() {
-        let iter = Iter::new([1u8, 2, 3]);
+    #[rstest]
+    #[case::non_empty(&[1u8, 2, 3], &[1u8, 2, 3])]
+    #[case::empty(&[], &[])]
+    fn assert_that_iter_encodes_elements(#[case] items: &[u8], #[case] expected: &[u8]) {
+        let iter = Iter::new(items);
         let mut buf = [0u8; BUF_SIZE];
         let mut encoder = &mut buf as &mut [u8];
         iter.encode(&mut encoder).unwrap();
         let written = BUF_SIZE - encoder.len();
-        assert_eq!(&buf[..written], &[1u8, 2, 3]);
-    }
-
-    #[test]
-    fn assert_that_iter_with_empty_sequence_encodes_nothing() {
-        let iter = Iter::new([] as [u8; 0]);
-        let mut buf = [0u8; BUF_SIZE];
-        let mut encoder = &mut buf as &mut [u8];
-        iter.encode(&mut encoder).unwrap();
-        let written = BUF_SIZE - encoder.len();
-        assert_eq!(&buf[..written], &[]);
+        assert_eq!(&buf[..written], expected);
     }
 
     #[test]

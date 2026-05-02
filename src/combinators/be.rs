@@ -143,6 +143,8 @@ mod tests {
     use core::borrow::Borrow;
     use core::num::NonZero;
 
+    use rstest::rstest;
+
     use super::*;
     use crate::Encodable;
 
@@ -217,15 +219,14 @@ mod tests {
         assert_eq!(val, 42u16);
     }
 
-    #[test]
-    fn assert_that_try_from_usize_succeeds() {
-        let be = BE::<u8>::try_from(5usize).unwrap();
-        assert_eq!(be.into_inner(), 5u8);
-    }
-
-    #[test]
-    fn assert_that_try_from_usize_fails_on_overflow() {
-        assert!(BE::<u8>::try_from(256usize).is_err());
+    #[rstest]
+    #[case::succeeds(5usize, Ok(5u8))]
+    #[case::overflows(256usize, Err(()))]
+    fn assert_that_be_u8_try_from_usize(#[case] val: usize, #[case] expected: Result<u8, ()>) {
+        let result = BE::<u8>::try_from(val)
+            .map(|be| be.into_inner())
+            .map_err(|_| ());
+        assert_eq!(result, expected);
     }
 
     #[test]
