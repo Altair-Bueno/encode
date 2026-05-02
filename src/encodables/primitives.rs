@@ -73,6 +73,8 @@ where
 
 #[cfg(test)]
 mod test {
+    use rstest::rstest;
+
     use super::*;
 
     const BUF_SIZE: usize = 64;
@@ -133,32 +135,15 @@ mod test {
         assert_eq!(expected, result);
     }
 
-    #[test]
-    fn assert_that_true_can_be_encoded() {
-        let expected = b"\x01";
-        let encodable = true;
-
+    #[rstest]
+    #[case::enabled(true, b"\x01")]
+    #[case::disabled(false, b"\x00")]
+    fn assert_that_booleans_can_be_encoded(#[case] val: bool, #[case] expected: &[u8]) {
         let mut buf = [0u8; BUF_SIZE];
         let mut encoder = &mut buf as &mut [u8];
-        encodable.encode(&mut encoder).unwrap();
+        val.encode(&mut encoder).unwrap();
         let written = BUF_SIZE - encoder.len();
-        let result = &buf[..written];
-
-        assert_eq!(expected, result);
-    }
-
-    #[test]
-    fn assert_that_false_can_be_encoded() {
-        let expected = b"\x00";
-        let encodable = false;
-
-        let mut buf = [0u8; BUF_SIZE];
-        let mut encoder = &mut buf as &mut [u8];
-        encodable.encode(&mut encoder).unwrap();
-        let written = BUF_SIZE - encoder.len();
-        let result = &buf[..written];
-
-        assert_eq!(expected, result);
+        assert_eq!(&buf[..written], expected);
     }
 
     #[test]

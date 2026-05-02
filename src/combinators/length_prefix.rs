@@ -163,3 +163,103 @@ where
         self.encodable.cmp(&other.encodable)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use core::borrow::Borrow;
+    use core::num::TryFromIntError;
+
+    use super::*;
+    use crate::Encodable;
+
+    const BUF_SIZE: usize = 32;
+
+    #[cfg(feature = "alloc")]
+    #[test]
+    fn assert_that_length_prefix_encodes_length_and_value() {
+        let mut buf = alloc::vec::Vec::new();
+        LengthPrefix::<_, u8, TryFromIntError>::new("hello")
+            .encode(&mut buf)
+            .unwrap();
+        assert_eq!(&buf, b"\x05hello");
+    }
+
+    #[test]
+    fn assert_that_length_prefix_into_inner_returns_value() {
+        let lp = LengthPrefix::<u8, u8, TryFromIntError>::new(42u8);
+        assert_eq!(lp.into_inner(), 42u8);
+    }
+
+    #[test]
+    fn assert_that_length_prefix_from_works() {
+        let lp: LengthPrefix<u8, u8, TryFromIntError> = 42u8.into();
+        assert_eq!(*lp, 42u8);
+    }
+
+    #[test]
+    fn assert_that_length_prefix_as_ref_works() {
+        let lp = LengthPrefix::<u8, u8, TryFromIntError>::new(42u8);
+        assert_eq!(lp.as_ref(), &42u8);
+    }
+
+    #[test]
+    fn assert_that_length_prefix_deref_works() {
+        let lp = LengthPrefix::<u8, u8, TryFromIntError>::new(42u8);
+        assert_eq!(*lp, 42u8);
+    }
+
+    #[test]
+    fn assert_that_length_prefix_borrow_works() {
+        let lp = LengthPrefix::<u8, u8, TryFromIntError>::new(42u8);
+        let borrowed: &u8 = lp.borrow();
+        assert_eq!(*borrowed, 42u8);
+    }
+
+    #[test]
+    fn assert_that_length_prefix_clone_works() {
+        let lp = LengthPrefix::<u8, u8, TryFromIntError>::new(42u8);
+        let clone = lp.clone();
+        assert_eq!(*lp, *clone);
+    }
+
+    #[test]
+    fn assert_that_length_prefix_default_works() {
+        let lp = LengthPrefix::<u8, u8, TryFromIntError>::default();
+        assert_eq!(*lp, 0u8);
+    }
+
+    #[test]
+    fn assert_that_length_prefix_eq_works() {
+        let lp1 = LengthPrefix::<u8, u8, TryFromIntError>::new(42u8);
+        let lp2 = LengthPrefix::<u8, u8, TryFromIntError>::new(42u8);
+        assert_eq!(lp1, lp2);
+    }
+
+    #[test]
+    fn assert_that_length_prefix_ord_works() {
+        let lp1 = LengthPrefix::<u8, u8, TryFromIntError>::new(1u8);
+        let lp2 = LengthPrefix::<u8, u8, TryFromIntError>::new(2u8);
+        assert!(lp1 < lp2);
+        assert_eq!(lp1.cmp(&lp2), core::cmp::Ordering::Less);
+    }
+
+    #[cfg(feature = "alloc")]
+    #[test]
+    fn assert_that_length_prefix_debug_works() {
+        let lp = LengthPrefix::<u8, u8, TryFromIntError>::new(42u8);
+        let debug_str = alloc::format!("{lp:?}");
+        assert!(debug_str.contains("42"));
+    }
+
+    #[test]
+    fn assert_that_length_prefix_encodes_size_correctly() {
+        let lp = LengthPrefix::<_, u8, TryFromIntError>::new("hello");
+        let mut encoder = crate::encoders::SizeEncoder::new();
+        lp.encode(&mut encoder).unwrap();
+        assert_eq!(
+            encoder.size(),
+            6,
+            "Expected 6 bytes: 1 for length prefix + 5 for \"hello\""
+        );
+    }
+}

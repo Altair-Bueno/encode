@@ -87,3 +87,56 @@ where
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use core::borrow::Borrow;
+
+    use rstest::rstest;
+
+    use super::*;
+    use crate::Encodable;
+
+    const BUF_SIZE: usize = 32;
+
+    #[rstest]
+    #[case::condition_met(true, &[1u8])]
+    #[case::condition_not_met(false, &[])]
+    fn assert_that_cond_encoding_respects_condition(
+        #[case] condition: bool,
+        #[case] expected: &[u8],
+    ) {
+        let cond = Cond::new(1u8, move |_: &u8| condition);
+        let mut buf = [0u8; BUF_SIZE];
+        let mut encoder = &mut buf as &mut [u8];
+        cond.encode(&mut encoder).unwrap();
+        let written = BUF_SIZE - encoder.len();
+        assert_eq!(&buf[..written], expected);
+    }
+
+    #[test]
+    fn assert_that_cond_into_inner_returns_value_and_condition() {
+        let cond = Cond::new(42u8, |_: &u8| true);
+        let (val, _) = cond.into_inner();
+        assert_eq!(val, 42u8);
+    }
+
+    #[test]
+    fn assert_that_cond_deref_works() {
+        let cond = Cond::new(42u8, |_: &u8| true);
+        assert_eq!(*cond, 42u8);
+    }
+
+    #[test]
+    fn assert_that_cond_as_ref_works() {
+        let cond = Cond::new(42u8, |_: &u8| true);
+        assert_eq!(cond.as_ref(), &42u8);
+    }
+
+    #[test]
+    fn assert_that_cond_borrow_works() {
+        let cond = Cond::new(42u8, |_: &u8| true);
+        let borrowed: &u8 = cond.borrow();
+        assert_eq!(*borrowed, 42u8);
+    }
+}

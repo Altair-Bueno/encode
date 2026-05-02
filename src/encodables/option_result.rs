@@ -36,37 +36,22 @@ where
 
 #[cfg(test)]
 mod tests {
+    use rstest::rstest;
+
     use super::*;
     use crate::encoders::InsufficientSpace;
 
     const BUF_SIZE: usize = 64;
 
-    #[test]
-    fn assert_that_some_option_can_be_encoded() {
-        let expected = b"\x01";
-        let encodable = Some(1u8);
-
+    #[rstest]
+    #[case::some(Some(1u8), &[1u8])]
+    #[case::none(None::<u8>, &[])]
+    fn assert_that_option_can_be_encoded(#[case] option: Option<u8>, #[case] expected: &[u8]) {
         let mut buf = [0u8; BUF_SIZE];
         let mut encoder = &mut buf as &mut [u8];
-        encodable.encode(&mut encoder).unwrap();
+        option.encode(&mut encoder).unwrap();
         let written = BUF_SIZE - encoder.len();
-        let result = &buf[..written];
-
-        assert_eq!(expected, result);
-    }
-
-    #[test]
-    fn assert_that_none_encodes_nothing() {
-        let expected = b"";
-        let encodable = None::<u8>;
-
-        let mut buf = [0u8; BUF_SIZE];
-        let mut encoder = &mut buf as &mut [u8];
-        encodable.encode(&mut encoder).unwrap();
-        let written = BUF_SIZE - encoder.len();
-        let result = &buf[..written];
-
-        assert_eq!(expected, result);
+        assert_eq!(&buf[..written], expected);
     }
 
     #[test]

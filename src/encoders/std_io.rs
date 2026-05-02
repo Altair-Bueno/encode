@@ -85,3 +85,70 @@ where
         self.0.write_all(&[byte] as &[u8])
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use std::borrow::BorrowMut;
+    use std::io::Cursor;
+
+    use super::*;
+    use crate::Encodable;
+
+    #[test]
+    fn assert_that_io_encoder_can_encode_bytes() {
+        let mut encoder = IoEncoder(Cursor::new(Vec::new()));
+        (b"hello" as &[u8], 0u8).encode(&mut encoder).unwrap();
+        assert_eq!(encoder.0.into_inner(), b"hello\0");
+    }
+
+    #[test]
+    fn assert_that_io_encoder_put_slice_writes_bytes() {
+        let mut encoder = IoEncoder(Cursor::new(Vec::new()));
+        encoder.put_slice(b"world").unwrap();
+        assert_eq!(encoder.0.into_inner(), b"world");
+    }
+
+    #[test]
+    fn assert_that_io_encoder_put_byte_writes_a_single_byte() {
+        let mut encoder = IoEncoder(Cursor::new(Vec::new()));
+        encoder.put_byte(0xAB).unwrap();
+        assert_eq!(encoder.0.into_inner(), [0xABu8]);
+    }
+
+    #[test]
+    fn assert_that_io_encoder_as_ref_works() {
+        let encoder = IoEncoder(Cursor::new(Vec::new()));
+        let _: &Cursor<Vec<u8>> = encoder.as_ref();
+    }
+
+    #[test]
+    fn assert_that_io_encoder_as_mut_works() {
+        let mut encoder = IoEncoder(Cursor::new(Vec::new()));
+        let _: &mut Cursor<Vec<u8>> = encoder.as_mut();
+    }
+
+    #[test]
+    fn assert_that_io_encoder_borrow_works() {
+        use std::borrow::Borrow;
+        let encoder = IoEncoder(Cursor::new(Vec::new()));
+        let _: &Cursor<Vec<u8>> = encoder.borrow();
+    }
+
+    #[test]
+    fn assert_that_io_encoder_borrow_mut_works() {
+        let mut encoder = IoEncoder(Cursor::new(Vec::new()));
+        let _: &mut Cursor<Vec<u8>> = encoder.borrow_mut();
+    }
+
+    #[test]
+    fn assert_that_io_encoder_deref_works() {
+        let encoder = IoEncoder(Cursor::new(Vec::new()));
+        let _: &Cursor<Vec<u8>> = &*encoder;
+    }
+
+    #[test]
+    fn assert_that_io_encoder_deref_mut_works() {
+        let mut encoder = IoEncoder(Cursor::new(Vec::new()));
+        let _: &mut Cursor<Vec<u8>> = &mut *encoder;
+    }
+}

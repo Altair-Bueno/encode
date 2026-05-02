@@ -137,3 +137,122 @@ macro_rules! impl_try_from_be_for_num {
 impl_try_from_be_for_num!(u8 u16 u32 u64 u128 i8 i16 i32 i64 i128);
 impl_encodeable_be_for_num!(u8 u16 u32 u64 u128 i8 i16 i32 i64 i128 f32 f64);
 impl_encodeable_be_for_nonzero_num!(u8 u16 u32 u64 u128 i8 i16 i32 i64 i128);
+
+#[cfg(test)]
+mod tests {
+    use core::borrow::Borrow;
+    use core::num::NonZero;
+
+    use rstest::rstest;
+
+    use super::*;
+    use crate::Encodable;
+
+    const BUF_SIZE: usize = 32;
+
+    #[test]
+    fn assert_that_u8_can_be_encoded_in_big_endian() {
+        let expected = [0xABu8];
+        let mut buf = [0u8; BUF_SIZE];
+        let mut encoder = &mut buf as &mut [u8];
+        BE::new(0xABu8).encode(&mut encoder).unwrap();
+        let written = BUF_SIZE - encoder.len();
+        assert_eq!(&buf[..written], &expected);
+    }
+
+    #[test]
+    fn assert_that_u16_can_be_encoded_in_big_endian() {
+        let expected = [0x00u8, 0x01u8];
+        let mut buf = [0u8; BUF_SIZE];
+        let mut encoder = &mut buf as &mut [u8];
+        BE::new(1u16).encode(&mut encoder).unwrap();
+        let written = BUF_SIZE - encoder.len();
+        assert_eq!(&buf[..written], &expected);
+    }
+
+    #[test]
+    fn assert_that_f32_can_be_encoded_in_big_endian() {
+        let val = 1.0f32;
+        let expected = val.to_be_bytes();
+        let mut buf = [0u8; BUF_SIZE];
+        let mut encoder = &mut buf as &mut [u8];
+        BE::new(val).encode(&mut encoder).unwrap();
+        let written = BUF_SIZE - encoder.len();
+        assert_eq!(&buf[..written], &expected);
+    }
+
+    #[test]
+    fn assert_that_be_into_inner_returns_the_value() {
+        let be = BE::new(42u32);
+        assert_eq!(be.into_inner(), 42u32);
+    }
+
+    #[test]
+    fn assert_that_be_deref_works() {
+        let be = BE::new(42u32);
+        assert_eq!(*be, 42u32);
+    }
+
+    #[test]
+    fn assert_that_be_as_ref_works() {
+        let be = BE::new(42u32);
+        assert_eq!(be.as_ref(), &42u32);
+    }
+
+    #[test]
+    fn assert_that_be_borrow_works() {
+        let be = BE::new(42u32);
+        let borrowed: &u32 = be.borrow();
+        assert_eq!(*borrowed, 42u32);
+    }
+
+    #[test]
+    fn assert_that_from_primitive_into_be_works() {
+        let be: BE<u16> = 42u16.into();
+        assert_eq!(be.into_inner(), 42u16);
+    }
+
+    #[test]
+    fn assert_that_primitive_from_be_works() {
+        let be = BE::new(42u16);
+        let val: u16 = be.into();
+        assert_eq!(val, 42u16);
+    }
+
+    #[rstest]
+    #[case::succeeds(5usize, Ok(5u8))]
+    #[case::overflows(256usize, Err(()))]
+    fn assert_that_be_u8_try_from_usize(#[case] val: usize, #[case] expected: Result<u8, ()>) {
+        let result = BE::<u8>::try_from(val)
+            .map(|be| be.into_inner())
+            .map_err(|_| ());
+        assert_eq!(result, expected);
+    }
+
+    #[test]
+    fn assert_that_nonzero_u16_can_be_encoded_in_big_endian() {
+        let expected = [0x00u8, 0x01u8];
+        let mut buf = [0u8; BUF_SIZE];
+        let mut encoder = &mut buf as &mut [u8];
+        BE::new(NonZero::<u16>::new(1).unwrap())
+            .encode(&mut encoder)
+            .unwrap();
+        let written = BUF_SIZE - encoder.len();
+        assert_eq!(&buf[..written], &expected);
+    }
+
+    #[test]
+    fn assert_that_from_nonzero_into_be_works() {
+        let nz = NonZero::<u16>::new(42).unwrap();
+        let be: BE<NonZero<u16>> = nz.into();
+        assert_eq!(be.into_inner().get(), 42u16);
+    }
+
+    #[test]
+    fn assert_that_nonzero_from_be_works() {
+        let nz = NonZero::<u16>::new(42).unwrap();
+        let be = BE::new(nz);
+        let val: NonZero<u16> = be.into();
+        assert_eq!(val.get(), 42u16);
+    }
+}
