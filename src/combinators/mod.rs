@@ -44,6 +44,7 @@
 //! | [`LengthPrefix`] | Encodes a length prefixed value ([TLV](https://en.wikipedia.org/wiki/Type–length–value)) |
 //! | [`Separated`] | Encodes a sequence of encodables separated by a given delimiter |
 //! | [`Iter`] | Encodes a sequence of encodables |
+//! | [`Indent`] | Prepends a prefix to each line of a string, splitting on a [`char`] pattern |
 //! | [`FromError`] | Transforms the error type of an encodable. |
 //!
 #![cfg_attr(
@@ -86,6 +87,7 @@ These types are supported when the `bytes` feature is enabled.
 mod be;
 mod cond;
 mod from_error;
+mod indent;
 mod iter;
 mod le;
 mod length_prefix;
@@ -94,6 +96,7 @@ mod separated;
 pub use be::BE;
 pub use cond::Cond;
 pub use from_error::FromError;
+pub use indent::Indent;
 pub use iter::Iter;
 pub use le::LE;
 pub use length_prefix::LengthPrefix;
