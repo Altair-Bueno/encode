@@ -13,3 +13,15 @@ impl core::fmt::Display for InsufficientSpace {
         write!(f, "The provided buffer has no space left for encoding")
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn assert_that_insufficient_space_displays_correctly() {
+        let err = InsufficientSpace;
+        let msg = err.to_string();
+        assert_eq!(msg, "The provided buffer has no space left for encoding");
+    }
+}

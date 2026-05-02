@@ -61,3 +61,53 @@ where
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::Encodable;
+
+    const BUF_SIZE: usize = 32;
+
+    #[test]
+    fn assert_that_separated_encodes_elements_with_separator() {
+        let items: [&[u8]; 3] = [b"a", b"b", b"c"];
+        let sep = Separated::new(&items, b", " as &[u8]);
+        let mut buf = [0u8; BUF_SIZE];
+        let mut encoder = &mut buf as &mut [u8];
+        sep.encode(&mut encoder).unwrap();
+        let written = BUF_SIZE - encoder.len();
+        assert_eq!(&buf[..written], b"a, b, c");
+    }
+
+    #[test]
+    fn assert_that_separated_with_single_element_has_no_separator() {
+        let items: [&[u8]; 1] = [b"only"];
+        let sep = Separated::new(&items, b", " as &[u8]);
+        let mut buf = [0u8; BUF_SIZE];
+        let mut encoder = &mut buf as &mut [u8];
+        sep.encode(&mut encoder).unwrap();
+        let written = BUF_SIZE - encoder.len();
+        assert_eq!(&buf[..written], b"only");
+    }
+
+    #[test]
+    fn assert_that_separated_with_empty_sequence_encodes_nothing() {
+        let items: [&[u8]; 0] = [];
+        let sep = Separated::new(&items, b", " as &[u8]);
+        let mut buf = [0u8; BUF_SIZE];
+        let mut encoder = &mut buf as &mut [u8];
+        sep.encode(&mut encoder).unwrap();
+        let written = BUF_SIZE - encoder.len();
+        assert_eq!(&buf[..written], b"");
+    }
+
+    #[test]
+    fn assert_that_separated_into_inner_returns_values() {
+        let items = [1u8, 2u8];
+        let sep = Separated::new(items, 0u8);
+        let (arr, s) = sep.into_inner();
+        assert_eq!(arr, [1u8, 2u8]);
+        assert_eq!(s, 0u8);
+    }
+}
