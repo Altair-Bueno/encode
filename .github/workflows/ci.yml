@@ -110,16 +110,19 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: nightly
-      - name: Install cargo-tarpaulin
+      - name: Install cargo-llvm-cov
         uses: taiki-e/install-action@v2
         with:
-          tool: cargo-tarpaulin
+          tool: cargo-llvm-cov
       - name: Gather coverage
-        run:
-          cargo tarpaulin --output-dir coverage --out lcov --all-features --doc
-          --all-targets
+        run: |
+          cargo llvm-cov --no-report --all-features --all-targets
+          cargo llvm-cov --no-report --all-features --doc
+          cargo llvm-cov report --lcov --output-path coverage/lcov.info
       - name: Publish to Codecov
         uses: codecov/codecov-action@v6
+        with:
+          files: coverage/lcov.info
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
   ci-check:
