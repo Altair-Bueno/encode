@@ -97,9 +97,7 @@ mod tests {
     #[test]
     fn assert_that_io_encoder_can_encode_bytes() {
         let mut encoder = IoEncoder(Cursor::new(Vec::new()));
-        (b"hello" as &[u8], 0u8)
-            .encode(&mut encoder)
-            .unwrap();
+        (b"hello" as &[u8], 0u8).encode(&mut encoder).unwrap();
         assert_eq!(encoder.0.into_inner(), b"hello\0");
     }
 
