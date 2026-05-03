@@ -240,6 +240,7 @@ mod tests {
         let lp1 = LengthPrefix::<u8, u8, TryFromIntError>::new(a);
         let lp2 = LengthPrefix::<u8, u8, TryFromIntError>::new(b);
         assert_eq!(lp1.cmp(&lp2), expected);
+        assert_eq!(lp1 == lp2, expected == core::cmp::Ordering::Equal);
     }
 
     #[cfg(feature = "alloc")]

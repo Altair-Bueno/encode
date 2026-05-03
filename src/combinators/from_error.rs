@@ -199,6 +199,7 @@ mod tests {
         let fe1 = FromError::<_, Infallible>::new(a);
         let fe2 = FromError::<_, Infallible>::new(b);
         assert_eq!(fe1.cmp(&fe2), expected);
+        assert_eq!(fe1 == fe2, expected == core::cmp::Ordering::Equal);
     }
 
     #[cfg(feature = "alloc")]
