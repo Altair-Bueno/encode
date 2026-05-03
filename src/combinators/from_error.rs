@@ -132,6 +132,8 @@ mod tests {
     use core::borrow::Borrow;
     use core::convert::Infallible;
 
+    use rstest::rstest;
+
     use super::*;
     use crate::Encodable;
 
@@ -185,19 +187,18 @@ mod tests {
         assert_eq!(*fe, 0u8);
     }
 
-    #[test]
-    fn assert_that_from_error_eq_works() {
-        let fe1 = FromError::<_, Infallible>::new(42u8);
-        let fe2 = FromError::<_, Infallible>::new(42u8);
-        assert_eq!(fe1, fe2);
-    }
-
-    #[test]
-    fn assert_that_from_error_ord_works() {
-        let fe1 = FromError::<_, Infallible>::new(1u8);
-        let fe2 = FromError::<_, Infallible>::new(2u8);
-        assert!(fe1 < fe2);
-        assert_eq!(fe1.cmp(&fe2), core::cmp::Ordering::Less);
+    #[rstest]
+    #[case::less(1u8, 2u8, core::cmp::Ordering::Less)]
+    #[case::equal(42u8, 42u8, core::cmp::Ordering::Equal)]
+    #[case::greater(2u8, 1u8, core::cmp::Ordering::Greater)]
+    fn assert_that_from_error_comparison_works(
+        #[case] a: u8,
+        #[case] b: u8,
+        #[case] expected: core::cmp::Ordering,
+    ) {
+        let fe1 = FromError::<_, Infallible>::new(a);
+        let fe2 = FromError::<_, Infallible>::new(b);
+        assert_eq!(fe1.cmp(&fe2), expected);
     }
 
     #[cfg(feature = "alloc")]

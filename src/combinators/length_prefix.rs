@@ -169,10 +169,10 @@ mod tests {
     use core::borrow::Borrow;
     use core::num::TryFromIntError;
 
+    use rstest::rstest;
+
     use super::*;
     use crate::Encodable;
-
-    const BUF_SIZE: usize = 32;
 
     #[cfg(feature = "alloc")]
     #[test]
@@ -228,19 +228,18 @@ mod tests {
         assert_eq!(*lp, 0u8);
     }
 
-    #[test]
-    fn assert_that_length_prefix_eq_works() {
-        let lp1 = LengthPrefix::<u8, u8, TryFromIntError>::new(42u8);
-        let lp2 = LengthPrefix::<u8, u8, TryFromIntError>::new(42u8);
-        assert_eq!(lp1, lp2);
-    }
-
-    #[test]
-    fn assert_that_length_prefix_ord_works() {
-        let lp1 = LengthPrefix::<u8, u8, TryFromIntError>::new(1u8);
-        let lp2 = LengthPrefix::<u8, u8, TryFromIntError>::new(2u8);
-        assert!(lp1 < lp2);
-        assert_eq!(lp1.cmp(&lp2), core::cmp::Ordering::Less);
+    #[rstest]
+    #[case::less(1u8, 2u8, core::cmp::Ordering::Less)]
+    #[case::equal(42u8, 42u8, core::cmp::Ordering::Equal)]
+    #[case::greater(2u8, 1u8, core::cmp::Ordering::Greater)]
+    fn assert_that_length_prefix_comparison_works(
+        #[case] a: u8,
+        #[case] b: u8,
+        #[case] expected: core::cmp::Ordering,
+    ) {
+        let lp1 = LengthPrefix::<u8, u8, TryFromIntError>::new(a);
+        let lp2 = LengthPrefix::<u8, u8, TryFromIntError>::new(b);
+        assert_eq!(lp1.cmp(&lp2), expected);
     }
 
     #[cfg(feature = "alloc")]
