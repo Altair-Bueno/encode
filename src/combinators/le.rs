@@ -141,7 +141,7 @@ impl_encodeable_le_for_nonzero_num!(u8 u16 u32 u64 u128 i8 i16 i32 i64 i128);
 #[cfg(test)]
 mod tests {
     use core::borrow::Borrow;
-    use core::num::NonZero;
+    use core::num::{NonZero, TryFromIntError};
 
     use rstest::rstest;
 
@@ -220,13 +220,15 @@ mod tests {
     }
 
     #[rstest]
-    #[case::succeeds(5usize, Ok(5u8))]
-    #[case::overflows(256usize, Err(()))]
-    fn assert_that_le_u8_try_from_usize(#[case] val: usize, #[case] expected: Result<u8, ()>) {
-        let result = LE::<u8>::try_from(val)
-            .map(|le| le.into_inner())
-            .map_err(|_| ());
-        assert_eq!(result, expected);
+    #[case::succeeds(5usize, Some(5u8))]
+    #[case::overflows(256usize, None)]
+    fn assert_that_le_u8_try_from_usize(#[case] val: usize, #[case] expected: Option<u8>) {
+        let result: Result<u8, TryFromIntError> = LE::<u8>::try_from(val).map(|le| le.into_inner());
+
+        match expected {
+            Some(expected) => assert_eq!(result.unwrap(), expected),
+            None => assert!(result.is_err()),
+        }
     }
 
     #[test]
