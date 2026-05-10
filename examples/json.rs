@@ -70,7 +70,16 @@ impl<'a, E: StrEncoder> Encodable<E> for CompactJson<'a> {
             Json::Null => "null".encode(encoder),
             Json::Bool(true) => "true".encode(encoder),
             Json::Bool(false) => "false".encode(encoder),
-            Json::Number(n) => format_args!("{n}").encode(encoder),
+            Json::Number(n) => {
+                // JSON does not permit NaN or +/-infinity numeric literals.
+                // Encode non-finite floating-point values as `null` so the
+                // output remains valid JSON.
+                if n.is_finite() {
+                    format_args!("{n}").encode(encoder)
+                } else {
+                    "null".encode(encoder)
+                }
+            }
             Json::String(s) => JsonString(s).encode(encoder),
             // We use the `Separated` combinator to encode the iterator as a JSON array.
             Json::Array(a) => (
