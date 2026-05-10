@@ -8,9 +8,10 @@
 //! ```sh
 //! cargo run --example json
 //! ```
+use core::iter::repeat;
+use encode::combinators::Iter;
 use encode::combinators::Separated;
 use encode::Encodable;
-use encode::EncodableSize;
 use encode::StrEncoder;
 use std::collections::HashMap;
 
@@ -52,28 +53,40 @@ impl<S: AsRef<str>, E: StrEncoder> Encodable<E> for JsonString<S> {
     }
 }
 
-impl<E: StrEncoder> Encodable<E> for Json {
+/// Encodes JSON without any whitespace (compact format).
+pub struct CompactJson<'a>(pub &'a Json);
+
+impl<'a> CompactJson<'a> {
+    pub fn new(json: &'a Json) -> Self {
+        CompactJson(json)
+    }
+}
+
+impl<'a, E: StrEncoder> Encodable<E> for CompactJson<'a> {
     type Error = E::Error;
 
-    #[inline]
     fn encode(&self, encoder: &mut E) -> Result<(), Self::Error> {
-        match self {
-            // Strings and characters can be encoded as is.
+        match self.0 {
             Json::Null => "null".encode(encoder),
             Json::Bool(true) => "true".encode(encoder),
             Json::Bool(false) => "false".encode(encoder),
-            // We use format_args! for numbers to avoid the overhead of allocating a string.
             Json::Number(n) => format_args!("{n}").encode(encoder),
-            // We use the custom `JsonString` combinator to escape the string according to the JSON
-            // spec.
             Json::String(s) => JsonString(s).encode(encoder),
-            // We use the `Separated` combinator to encode the iterator (&Vec<Json>) as a JSON
-            // array.
-            Json::Array(a) => ('[', Separated::new(a, ','), ']').encode(encoder),
+            // We use the `Separated` combinator to encode the iterator as a JSON array.
+            Json::Array(a) => (
+                '[',
+                Separated::new(a.iter().map(CompactJson::new), ','),
+                ']',
+            )
+                .encode(encoder),
             // Notice how we can use tuples to add the bracket prefix and suffix to the object.
             Json::Object(o) => (
                 '{',
-                Separated::new(o.iter().map(|(k, v)| (JsonString(k), ':', v)), ','),
+                Separated::new(
+                    o.iter()
+                        .map(|(k, v)| (JsonString(k), ':', CompactJson::new(v))),
+                    ',',
+                ),
                 '}',
             )
                 .encode(encoder),
@@ -81,13 +94,91 @@ impl<E: StrEncoder> Encodable<E> for Json {
     }
 }
 
+/// Encodes JSON with configurable indentation (pretty format).
+///
+/// The `depth` field tracks the current nesting level; start at `0` via [`PrettyJson::new`].
+/// The `indent` field controls what string is repeated per level (default: `"  "` for 2 spaces).
+/// Set it to `"\t"` for tabs or `"    "` for 4-space indentation.
+pub struct PrettyJson<'a> {
+    pub json: &'a Json,
+    pub depth: usize,
+    pub indent: &'a str,
+}
+
+impl<'a> PrettyJson<'a> {
+    pub fn new(json: &'a Json, indent: &'a str) -> Self {
+        PrettyJson {
+            json,
+            depth: 0,
+            indent,
+        }
+    }
+}
+
+impl<'a, E: StrEncoder> Encodable<E> for PrettyJson<'a> {
+    type Error = E::Error;
+
+    fn encode(&self, encoder: &mut E) -> Result<(), Self::Error> {
+        match self.json {
+            Json::Array(a) if a.is_empty() => "[]".encode(encoder),
+            Json::Object(o) if o.is_empty() => "{}".encode(encoder),
+            Json::Array(a) => (
+                "[\n",
+                Separated::new(
+                    a.iter().map(|json| {
+                        (
+                            Iter::new(repeat(self.indent).take(self.depth + 1)),
+                            PrettyJson {
+                                json,
+                                depth: self.depth + 1,
+                                indent: self.indent,
+                            },
+                        )
+                    }),
+                    ",\n",
+                ),
+                '\n',
+                Iter::new(repeat(self.indent).take(self.depth)),
+                ']',
+            )
+                .encode(encoder),
+            // Notice how we can use tuples to add the bracket prefix and suffix to the object.
+            Json::Object(o) => (
+                "{\n",
+                Separated::new(
+                    o.iter().map(|(k, json)| {
+                        (
+                            Iter::new(repeat(self.indent).take(self.depth + 1)),
+                            JsonString(k),
+                            ": ",
+                            PrettyJson {
+                                json,
+                                depth: self.depth + 1,
+                                indent: self.indent,
+                            },
+                        )
+                    }),
+                    ",\n",
+                ),
+                '\n',
+                Iter::new(repeat(self.indent).take(self.depth)),
+                '}',
+            )
+                .encode(encoder),
+            // Fall back to the compact encoder for these simpler values
+            _ => CompactJson::new(self.json).encode(encoder),
+        }
+    }
+}
+
 // Notice how we can use our encoder to implement traits such as `Display`.
-//
-// Pretty printing could be achieved by dispatching to a different encoder if
-// `f.alternative()` is true.
 impl std::fmt::Display for Json {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        self.encode(f)
+        if f.alternate() {
+            PrettyJson::new(self, "  ").encode(f)
+        } else {
+            CompactJson::new(self).encode(f)
+        }
     }
 }
 
@@ -105,23 +196,22 @@ fn main() -> Result<(), Box<dyn core::error::Error>> {
             ]),
         ),
         ("weird \n string\\\0".into(), Json::Null),
+        (
+            "nested".into(),
+            Json::Array(vec![
+                Json::Array(vec![]),
+                Json::Array(vec![Json::Object(HashMap::from([
+                    ("key".into(), Json::Null),
+                    ("another".into(), Json::Array(vec![Json::Null])),
+                ]))]),
+                Json::Array(vec![]),
+            ]),
+        ),
     ]));
-    // We can use the SizeEncoder to calculate the size of the final JSON string.
-    let size = json.encoded_size()?;
-    println!("Expected JSON size: {}", size);
-
-    // We can also encode the JSON string into a buffer, like a Vec<u8> or &mut
-    // [u8]. Because our encoder is an `StrEncoder` and it can only generate
-    // UTF-8 valid data, we can use a `String` as the buffer.
-    let mut s = String::with_capacity(size);
-    json.encode(&mut s)?;
-
-    println!("{s}");
-    assert_eq!(
-        s.len(),
-        size,
-        "The size of the encoded JSON string should match the calculated size"
-    );
+    println!("{:=^80}", "Compact");
+    println!("{json}");
+    println!("{:=^80}", "Pretty");
+    println!("{json:#}");
     Ok(())
 }
 
@@ -134,24 +224,30 @@ mod test {
     #[test]
     fn assert_booleans_are_encoded_correctly() {
         let mut buf = Vec::new();
-        Json::Bool(true).encode(&mut buf).unwrap();
+        CompactJson::new(&Json::Bool(true))
+            .encode(&mut buf)
+            .unwrap();
         assert_eq!(&buf, b"true");
         buf.clear();
-        Json::Bool(false).encode(&mut buf).unwrap();
+        CompactJson::new(&Json::Bool(false))
+            .encode(&mut buf)
+            .unwrap();
         assert_eq!(&buf, b"false");
     }
 
     #[test]
     fn assert_numbers_are_encoded_correctly() {
         let mut buf = Vec::new();
-        Json::Number(42.0).encode(&mut buf).unwrap();
+        CompactJson::new(&Json::Number(42.0))
+            .encode(&mut buf)
+            .unwrap();
         assert_eq!(&buf, b"42");
     }
 
     #[test]
     fn assert_strings_are_encoded_correctly() {
         let mut buf = Vec::new();
-        Json::String("Hello, World!".into())
+        CompactJson::new(&Json::String("Hello, World!".into()))
             .encode(&mut buf)
             .unwrap();
         let s = String::from_utf8(buf).unwrap();
@@ -161,11 +257,11 @@ mod test {
     #[test]
     fn assert_arrays_are_encoded_correctly() {
         let mut buf = Vec::new();
-        Json::Array(vec![
+        CompactJson::new(&Json::Array(vec![
             Json::Number(1.0),
             Json::Number(2.0),
             Json::Number(3.0),
-        ])
+        ]))
         .encode(&mut buf)
         .unwrap();
         assert_eq!(&buf, b"[1,2,3]");
@@ -174,17 +270,19 @@ mod test {
     #[test]
     fn assert_empty_arrays_are_encoded_correctly() {
         let mut buf = Vec::new();
-        Json::Array(vec![]).encode(&mut buf).unwrap();
+        CompactJson::new(&Json::Array(vec![]))
+            .encode(&mut buf)
+            .unwrap();
         assert_eq!(&buf, b"[]");
     }
 
     #[test]
     fn assert_objects_are_encoded_correctly() {
         let mut buf = Vec::new();
-        Json::Object(HashMap::from([(
+        CompactJson::new(&Json::Object(HashMap::from([(
             "name".into(),
             Json::String("John Doe".into()),
-        )]))
+        )])))
         .encode(&mut buf)
         .unwrap();
         assert_eq!(&buf, b"{\"name\":\"John Doe\"}");
@@ -193,14 +291,78 @@ mod test {
     #[test]
     fn assert_empty_objects_are_encoded_correctly() {
         let mut buf = Vec::new();
-        Json::Object(HashMap::new()).encode(&mut buf).unwrap();
+        CompactJson::new(&Json::Object(HashMap::new()))
+            .encode(&mut buf)
+            .unwrap();
         assert_eq!(&buf, b"{}");
     }
 
     #[test]
     fn assert_nulls_are_encoded_correctly() {
         let mut buf = Vec::new();
-        Json::Null.encode(&mut buf).unwrap();
+        CompactJson::new(&Json::Null).encode(&mut buf).unwrap();
         assert_eq!(&buf, b"null");
+    }
+
+    #[test]
+    fn assert_compact_display_uses_no_whitespace() {
+        let json = Json::Array(vec![Json::Number(1.0), Json::Number(2.0)]);
+        assert_eq!(format!("{json}"), "[1,2]");
+    }
+
+    #[test]
+    fn assert_pretty_empty_array() {
+        assert_eq!(format!("{:#}", Json::Array(vec![])), "[]");
+    }
+
+    #[test]
+    fn assert_pretty_array() {
+        let json = Json::Array(vec![Json::Number(1.0), Json::Number(2.0)]);
+        assert_eq!(format!("{json:#}"), "[\n  1,\n  2\n]");
+    }
+
+    #[test]
+    fn assert_pretty_nested_array() {
+        let json = Json::Array(vec![Json::Array(vec![Json::Number(1.0)])]);
+        assert_eq!(format!("{json:#}"), "[\n  [\n    1\n  ]\n]");
+    }
+
+    #[test]
+    fn assert_pretty_empty_object() {
+        assert_eq!(format!("{:#}", Json::Object(HashMap::new())), "{}");
+    }
+
+    #[test]
+    fn assert_pretty_object() {
+        let json = Json::Object(HashMap::from([("x".into(), Json::Number(1.0))]));
+        assert_eq!(format!("{json:#}"), "{\n  \"x\": 1\n}");
+    }
+
+    #[test]
+    fn assert_pretty_tabs() {
+        let json = Json::Array(vec![Json::Number(1.0), Json::Number(2.0)]);
+        let mut buf = String::new();
+        PrettyJson {
+            json: &json,
+            depth: 0,
+            indent: "\t",
+        }
+        .encode(&mut buf)
+        .unwrap();
+        assert_eq!(buf, "[\n\t1,\n\t2\n]");
+    }
+
+    #[test]
+    fn assert_pretty_four_spaces() {
+        let json = Json::Array(vec![Json::Number(1.0), Json::Number(2.0)]);
+        let mut buf = String::new();
+        PrettyJson {
+            json: &json,
+            depth: 0,
+            indent: "    ",
+        }
+        .encode(&mut buf)
+        .unwrap();
+        assert_eq!(buf, "[\n    1,\n    2\n]");
     }
 }
