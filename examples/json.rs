@@ -108,14 +108,14 @@ impl<'a, E: StrEncoder> Encodable<E> for CompactJson<'a> {
 /// The `depth` field tracks the current nesting level; start at `0` via [`PrettyJson::new`].
 /// The `indent` field controls what string is repeated per level (default: `"  "` for 2 spaces).
 /// Set it to `"\t"` for tabs or `"    "` for 4-space indentation.
-pub struct PrettyJson<'a> {
-    pub json: &'a Json,
+pub struct PrettyJson<'j, 'i> {
+    pub json: &'j Json,
     pub depth: usize,
-    pub indent: &'a str,
+    pub indent: &'i str,
 }
 
-impl<'a> PrettyJson<'a> {
-    pub fn new(json: &'a Json, indent: &'a str) -> Self {
+impl<'j, 'i> PrettyJson<'j, 'i> {
+    pub fn new(json: &'j Json, indent: &'i str) -> Self {
         PrettyJson {
             json,
             depth: 0,
@@ -124,7 +124,7 @@ impl<'a> PrettyJson<'a> {
     }
 }
 
-impl<'a, E: StrEncoder> Encodable<E> for PrettyJson<'a> {
+impl<'j, 'i, E: StrEncoder> Encodable<E> for PrettyJson<'j, 'i> {
     type Error = E::Error;
 
     fn encode(&self, encoder: &mut E) -> Result<(), Self::Error> {
