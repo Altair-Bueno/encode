@@ -50,6 +50,13 @@ mod test {
     }
 
     #[test]
+    fn assert_that_vec_put_byte_appends_a_single_byte() {
+        let mut buf = Vec::new();
+        buf.put_byte(0xAB).unwrap();
+        assert_eq!(buf, [0xABu8]);
+    }
+
+    #[test]
     fn assert_that_string_grows() {
         let mut buf = String::with_capacity(1);
         let encodable = "hello";
