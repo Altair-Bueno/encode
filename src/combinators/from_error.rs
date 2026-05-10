@@ -126,3 +126,87 @@ impl<E: Ord, DstError> Ord for FromError<E, DstError> {
         self.encodable.cmp(&other.encodable)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use core::borrow::Borrow;
+    use core::convert::Infallible;
+
+    use rstest::rstest;
+
+    use super::*;
+    use crate::Encodable;
+
+    const BUF_SIZE: usize = 32;
+
+    #[test]
+    fn assert_that_from_error_encodes_value() {
+        let fe = FromError::<u8, crate::encoders::InsufficientSpace>::new(1u8);
+        let mut buf = [0u8; BUF_SIZE];
+        let mut encoder = &mut buf as &mut [u8];
+        fe.encode(&mut encoder).unwrap();
+        let written = BUF_SIZE - encoder.len();
+        assert_eq!(&buf[..written], &[1u8]);
+    }
+
+    #[test]
+    fn assert_that_from_error_into_inner_returns_value() {
+        let fe = FromError::<_, Infallible>::new(42u8);
+        assert_eq!(fe.into_inner(), 42u8);
+    }
+
+    #[test]
+    fn assert_that_from_error_deref_works() {
+        let fe = FromError::<_, Infallible>::new(42u8);
+        assert_eq!(*fe, 42u8);
+    }
+
+    #[test]
+    fn assert_that_from_error_as_ref_works() {
+        let fe = FromError::<_, Infallible>::new(42u8);
+        assert_eq!(fe.as_ref(), &42u8);
+    }
+
+    #[test]
+    fn assert_that_from_error_borrow_works() {
+        let fe = FromError::<_, Infallible>::new(42u8);
+        let borrowed: &u8 = fe.borrow();
+        assert_eq!(*borrowed, 42u8);
+    }
+
+    #[test]
+    fn assert_that_from_error_clone_works() {
+        let fe = FromError::<_, Infallible>::new(42u8);
+        let clone = fe.clone();
+        assert_eq!(*fe, *clone);
+    }
+
+    #[test]
+    fn assert_that_from_error_default_works() {
+        let fe = FromError::<u8, Infallible>::default();
+        assert_eq!(*fe, 0u8);
+    }
+
+    #[rstest]
+    #[case::less(1u8, 2u8, core::cmp::Ordering::Less)]
+    #[case::equal(42u8, 42u8, core::cmp::Ordering::Equal)]
+    #[case::greater(2u8, 1u8, core::cmp::Ordering::Greater)]
+    fn assert_that_from_error_comparison_works(
+        #[case] a: u8,
+        #[case] b: u8,
+        #[case] expected: core::cmp::Ordering,
+    ) {
+        let fe1 = FromError::<_, Infallible>::new(a);
+        let fe2 = FromError::<_, Infallible>::new(b);
+        assert_eq!(fe1.cmp(&fe2), expected);
+        assert_eq!(fe1 == fe2, expected == core::cmp::Ordering::Equal);
+    }
+
+    #[cfg(feature = "alloc")]
+    #[test]
+    fn assert_that_from_error_debug_works() {
+        let fe = FromError::<_, Infallible>::new(42u8);
+        let debug_str = alloc::format!("{fe:?}");
+        assert!(debug_str.contains("42"));
+    }
+}

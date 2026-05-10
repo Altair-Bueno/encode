@@ -137,3 +137,124 @@ macro_rules! impl_try_from_le_for_num {
 impl_try_from_le_for_num!(u8 u16 u32 u64 u128 i8 i16 i32 i64 i128);
 impl_encodeable_le_for_num!(u8 u16 u32 u64 u128 i8 i16 i32 i64 i128 f32 f64);
 impl_encodeable_le_for_nonzero_num!(u8 u16 u32 u64 u128 i8 i16 i32 i64 i128);
+
+#[cfg(test)]
+mod tests {
+    use core::borrow::Borrow;
+    use core::num::{NonZero, TryFromIntError};
+
+    use rstest::rstest;
+
+    use super::*;
+    use crate::Encodable;
+
+    const BUF_SIZE: usize = 32;
+
+    #[test]
+    fn assert_that_u8_can_be_encoded_in_little_endian() {
+        let expected = [0xABu8];
+        let mut buf = [0u8; BUF_SIZE];
+        let mut encoder = &mut buf as &mut [u8];
+        LE::new(0xABu8).encode(&mut encoder).unwrap();
+        let written = BUF_SIZE - encoder.len();
+        assert_eq!(&buf[..written], &expected);
+    }
+
+    #[test]
+    fn assert_that_u16_can_be_encoded_in_little_endian() {
+        let expected = [0x01u8, 0x00u8];
+        let mut buf = [0u8; BUF_SIZE];
+        let mut encoder = &mut buf as &mut [u8];
+        LE::new(1u16).encode(&mut encoder).unwrap();
+        let written = BUF_SIZE - encoder.len();
+        assert_eq!(&buf[..written], &expected);
+    }
+
+    #[test]
+    fn assert_that_f32_can_be_encoded_in_little_endian() {
+        let val = 1.0f32;
+        let expected = val.to_le_bytes();
+        let mut buf = [0u8; BUF_SIZE];
+        let mut encoder = &mut buf as &mut [u8];
+        LE::new(val).encode(&mut encoder).unwrap();
+        let written = BUF_SIZE - encoder.len();
+        assert_eq!(&buf[..written], &expected);
+    }
+
+    #[test]
+    fn assert_that_le_into_inner_returns_the_value() {
+        let le = LE::new(42u32);
+        assert_eq!(le.into_inner(), 42u32);
+    }
+
+    #[test]
+    fn assert_that_le_deref_works() {
+        let le = LE::new(42u32);
+        assert_eq!(*le, 42u32);
+    }
+
+    #[test]
+    fn assert_that_le_as_ref_works() {
+        let le = LE::new(42u32);
+        assert_eq!(le.as_ref(), &42u32);
+    }
+
+    #[test]
+    fn assert_that_le_borrow_works() {
+        let le = LE::new(42u32);
+        let borrowed: &u32 = le.borrow();
+        assert_eq!(*borrowed, 42u32);
+    }
+
+    #[test]
+    fn assert_that_from_primitive_into_le_works() {
+        let le: LE<u16> = 42u16.into();
+        assert_eq!(le.into_inner(), 42u16);
+    }
+
+    #[test]
+    fn assert_that_primitive_from_le_works() {
+        let le = LE::new(42u16);
+        let val: u16 = le.into();
+        assert_eq!(val, 42u16);
+    }
+
+    #[rstest]
+    #[case::succeeds(5usize, Some(5u8))]
+    #[case::overflows(256usize, None)]
+    fn assert_that_le_u8_try_from_usize(#[case] val: usize, #[case] expected: Option<u8>) {
+        let result: Result<u8, TryFromIntError> = LE::<u8>::try_from(val).map(|le| le.into_inner());
+
+        match expected {
+            Some(expected) => assert_eq!(result.unwrap(), expected),
+            None => assert!(result.is_err()),
+        }
+    }
+
+    #[test]
+    fn assert_that_nonzero_u16_can_be_encoded_in_little_endian() {
+        let expected = [0x01u8, 0x00u8];
+        let mut buf = [0u8; BUF_SIZE];
+        let mut encoder = &mut buf as &mut [u8];
+        LE::new(NonZero::<u16>::new(1).unwrap())
+            .encode(&mut encoder)
+            .unwrap();
+        let written = BUF_SIZE - encoder.len();
+        assert_eq!(&buf[..written], &expected);
+    }
+
+    #[test]
+    fn assert_that_from_nonzero_into_le_works() {
+        let nz = NonZero::<u16>::new(42).unwrap();
+        let le: LE<NonZero<u16>> = nz.into();
+        assert_eq!(le.into_inner().get(), 42u16);
+    }
+
+    #[test]
+    fn assert_that_nonzero_from_le_works() {
+        let nz = NonZero::<u16>::new(42).unwrap();
+        let le = LE::new(nz);
+        let val: NonZero<u16> = le.into();
+        assert_eq!(val.get(), 42u16);
+    }
+}

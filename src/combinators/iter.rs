@@ -77,3 +77,53 @@ where
         Ok(())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use core::borrow::Borrow;
+
+    use rstest::rstest;
+
+    use super::*;
+    use crate::Encodable;
+
+    const BUF_SIZE: usize = 32;
+
+    #[rstest]
+    #[case::non_empty(&[1u8, 2, 3], &[1u8, 2, 3])]
+    #[case::empty(&[], &[])]
+    fn assert_that_iter_encodes_elements(#[case] items: &[u8], #[case] expected: &[u8]) {
+        let iter = Iter::new(items);
+        let mut buf = [0u8; BUF_SIZE];
+        let mut encoder = &mut buf as &mut [u8];
+        iter.encode(&mut encoder).unwrap();
+        let written = BUF_SIZE - encoder.len();
+        assert_eq!(&buf[..written], expected);
+    }
+
+    #[test]
+    fn assert_that_iter_into_inner_returns_the_value() {
+        let iter = Iter::new([1u8, 2, 3]);
+        let val = iter.into_inner();
+        assert_eq!(val, [1u8, 2, 3]);
+    }
+
+    #[test]
+    fn assert_that_iter_deref_works() {
+        let iter = Iter::new([1u8, 2, 3]);
+        assert_eq!(iter.len(), 3);
+    }
+
+    #[test]
+    fn assert_that_iter_as_ref_works() {
+        let iter = Iter::new([1u8, 2, 3]);
+        assert_eq!(iter.as_ref(), &[1u8, 2, 3]);
+    }
+
+    #[test]
+    fn assert_that_iter_borrow_works() {
+        let iter = Iter::new([1u8, 2, 3]);
+        let borrowed: &[u8; 3] = iter.borrow();
+        assert_eq!(borrowed, &[1u8, 2, 3]);
+    }
+}

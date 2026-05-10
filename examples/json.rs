@@ -219,20 +219,17 @@ fn main() -> Result<(), Box<dyn core::error::Error>> {
 mod test {
     //! Tests for the JSON encoder. Do not include object tests as the order of
     //! the keys is not guaranteed for [`HashMap`].
+    use rstest::rstest;
+
     use super::*;
 
-    #[test]
-    fn assert_booleans_are_encoded_correctly() {
+    #[rstest]
+    #[case::enabled(Json::Bool(true), b"true" as &[u8])]
+    #[case::disabled(Json::Bool(false), b"false")]
+    fn assert_booleans_are_encoded_correctly(#[case] json: Json, #[case] expected: &[u8]) {
         let mut buf = Vec::new();
-        CompactJson::new(&Json::Bool(true))
-            .encode(&mut buf)
-            .unwrap();
-        assert_eq!(&buf, b"true");
-        buf.clear();
-        CompactJson::new(&Json::Bool(false))
-            .encode(&mut buf)
-            .unwrap();
-        assert_eq!(&buf, b"false");
+        CompactJson::new(&json).encode(&mut buf).unwrap();
+        assert_eq!(&buf, expected);
     }
 
     #[test]
@@ -254,47 +251,28 @@ mod test {
         assert_eq!(s, "\"Hello, World!\"");
     }
 
-    #[test]
-    fn assert_arrays_are_encoded_correctly() {
+    #[rstest]
+    #[case::non_empty(
+        Json::Array(vec![Json::Number(1.0), Json::Number(2.0), Json::Number(3.0)]),
+        b"[1,2,3]" as &[u8]
+    )]
+    #[case::empty(Json::Array(vec![]), b"[]")]
+    fn assert_arrays_are_encoded_correctly(#[case] json: Json, #[case] expected: &[u8]) {
         let mut buf = Vec::new();
-        CompactJson::new(&Json::Array(vec![
-            Json::Number(1.0),
-            Json::Number(2.0),
-            Json::Number(3.0),
-        ]))
-        .encode(&mut buf)
-        .unwrap();
-        assert_eq!(&buf, b"[1,2,3]");
+        CompactJson::new(&json).encode(&mut buf).unwrap();
+        assert_eq!(&buf, expected);
     }
 
-    #[test]
-    fn assert_empty_arrays_are_encoded_correctly() {
+    #[rstest]
+    #[case::non_empty(
+        Json::Object(HashMap::from([("name".into(), Json::String("John Doe".into()))])),
+        b"{\"name\":\"John Doe\"}" as &[u8]
+    )]
+    #[case::empty(Json::Object(HashMap::new()), b"{}")]
+    fn assert_objects_are_encoded_correctly(#[case] json: Json, #[case] expected: &[u8]) {
         let mut buf = Vec::new();
-        CompactJson::new(&Json::Array(vec![]))
-            .encode(&mut buf)
-            .unwrap();
-        assert_eq!(&buf, b"[]");
-    }
-
-    #[test]
-    fn assert_objects_are_encoded_correctly() {
-        let mut buf = Vec::new();
-        CompactJson::new(&Json::Object(HashMap::from([(
-            "name".into(),
-            Json::String("John Doe".into()),
-        )])))
-        .encode(&mut buf)
-        .unwrap();
-        assert_eq!(&buf, b"{\"name\":\"John Doe\"}");
-    }
-
-    #[test]
-    fn assert_empty_objects_are_encoded_correctly() {
-        let mut buf = Vec::new();
-        CompactJson::new(&Json::Object(HashMap::new()))
-            .encode(&mut buf)
-            .unwrap();
-        assert_eq!(&buf, b"{}");
+        CompactJson::new(&json).encode(&mut buf).unwrap();
+        assert_eq!(&buf, expected);
     }
 
     #[test]

@@ -184,3 +184,14 @@ where
         Ok(encoder.size())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn assert_that_encoded_size_returns_byte_count() {
+        let size = "hello".encoded_size().unwrap();
+        assert_eq!(size, 5);
+    }
+}

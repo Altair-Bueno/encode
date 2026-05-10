@@ -92,4 +92,26 @@ mod tests {
         write!(size_encoder, "{s}").unwrap();
         assert_eq!(size_encoder.size(), s.len());
     }
+
+    #[test]
+    fn assert_that_put_slice_increments_size() {
+        let mut encoder = SizeEncoder::new();
+        encoder.put_slice(b"hello").unwrap();
+        assert_eq!(encoder.size(), 5);
+    }
+
+    #[test]
+    fn assert_that_put_byte_increments_size_by_one() {
+        let mut encoder = SizeEncoder::new();
+        encoder.put_byte(0xAB).unwrap();
+        assert_eq!(encoder.size(), 1);
+    }
+
+    #[test]
+    fn assert_that_size_encoder_converts_to_usize() {
+        let mut encoder = SizeEncoder::new();
+        encoder.put_slice(b"hello").unwrap();
+        let size: usize = encoder.into();
+        assert_eq!(size, 5);
+    }
 }
