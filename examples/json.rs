@@ -226,8 +226,8 @@ fn main() -> Result<(), Box<dyn core::error::Error>> {
 
 #[cfg(test)]
 mod test {
-    //! Tests for the JSON encoder. Do not include object tests as the order of
-    //! the keys is not guaranteed for [`HashMap`].
+    //! Tests for the JSON encoder. Avoid multi-key object tests because the
+    //! key order is not guaranteed for [`HashMap`].
     use rstest::rstest;
 
     use super::*;
