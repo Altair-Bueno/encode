@@ -121,7 +121,7 @@ jobs:
           mkdir -p coverage
           cargo llvm-cov report --lcov --output-path coverage/lcov.info
       - name: Publish to Codecov
-        uses: codecov/codecov-action@v6
+        uses: codecov/codecov-action@v7
         with:
           files: coverage/lcov.info
         env:
