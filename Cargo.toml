@@ -23,7 +23,7 @@ arrayvec = ["dep:arrayvec"]
 bytes = ["dep:bytes"]
 
 [dev-dependencies]
-rstest = "0.18"
+rstest = "0.26"
 
 [dependencies]
 arrayvec = { version = "0.7.6", optional = true, default-features = false }
