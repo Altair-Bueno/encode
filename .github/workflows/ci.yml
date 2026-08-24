@@ -15,7 +15,7 @@ jobs:
       - name: Fetch Repository
         uses: actions/checkout@v7
       - name: Install Typos
-        uses: taiki-e/install-action@v2.85.13
+        uses: taiki-e/install-action@v2.86.5
         with:
           tool: typos-cli
       - name: run typos
@@ -28,7 +28,7 @@ jobs:
       - name: Fetch Repository
         uses: actions/checkout@v7
       - name: Install Taplo
-        uses: taiki-e/install-action@v2.85.13
+        uses: taiki-e/install-action@v2.86.5
         with:
           tool: taplo-cli
       - name: Run Taplo
@@ -111,7 +111,7 @@ jobs:
         with:
           toolchain: nightly
       - name: Install cargo-llvm-cov
-        uses: taiki-e/install-action@v2.85.13
+        uses: taiki-e/install-action@v2.86.5
         with:
           tool: cargo-llvm-cov
       - name: Gather coverage
