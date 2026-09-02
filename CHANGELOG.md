@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0](https://github.com/Altair-Bueno/encode/compare/v1.0.0...v1.1.0) - 2026-09-02
+
+### Added
+
+- improve the json example with alternative formatting ([#34](https://github.com/Altair-Bueno/encode/pull/34))
+
+### Fixed
+
+- Use pastey instead of paste ([#44](https://github.com/Altair-Bueno/encode/pull/44))
+
+### Other
+
+- replace deleted actionsx/prettier with creyD/prettier_action ([#46](https://github.com/Altair-Bueno/encode/pull/46))
+- *(deps)* bump the github-actions-updates group with 2 updates ([#43](https://github.com/Altair-Bueno/encode/pull/43))
+- *(deps)* bump taiki-e/install-action from 2.85.13 to 2.86.5 in the github-actions-updates group ([#42](https://github.com/Altair-Bueno/encode/pull/42))
+- *(deps)* bump taiki-e/install-action from 2.85.10 to 2.85.13 in the github-actions-updates group ([#41](https://github.com/Altair-Bueno/encode/pull/41))
+- *(deps)* bump taiki-e/install-action from 2.85.5 to 2.85.10 in the github-actions-updates group ([#40](https://github.com/Altair-Bueno/encode/pull/40))
+- *(deps)* bump taiki-e/install-action from 2 to 2.85.5 in the github-actions-updates group ([#39](https://github.com/Altair-Bueno/encode/pull/39))
+- *(deps)* bump the github-actions-updates group across 1 directory with 3 updates ([#38](https://github.com/Altair-Bueno/encode/pull/38))
+- Switch coverage tooling from cargo-tarpaulin to cargo-llvm-cov ([#33](https://github.com/Altair-Bueno/encode/pull/33))
+- *(deps)* bump codecov/codecov-action ([#32](https://github.com/Altair-Bueno/encode/pull/32))
+- *(deps)* bump actions/cache in the github-actions-updates group ([#31](https://github.com/Altair-Bueno/encode/pull/31))
+- *(deps)* bump actions/checkout in the github-actions-updates group ([#30](https://github.com/Altair-Bueno/encode/pull/30))
+- *(deps)* bump actions/checkout in the github-actions-updates group ([#28](https://github.com/Altair-Bueno/encode/pull/28))
+
 ## [1.0.0](https://github.com/Altair-Bueno/encode/compare/v0.2.4...v1.0.0) - 2025-06-29
 
 ### Fixed
