@@ -15,7 +15,7 @@ jobs:
       - name: Fetch Repository
         uses: actions/checkout@v7
       - name: Install Typos
-        uses: taiki-e/install-action@v2.85.10
+        uses: taiki-e/install-action@v2.87.0
         with:
           tool: typos-cli
       - name: run typos
@@ -28,7 +28,7 @@ jobs:
       - name: Fetch Repository
         uses: actions/checkout@v7
       - name: Install Taplo
-        uses: taiki-e/install-action@v2.85.10
+        uses: taiki-e/install-action@v2.87.0
         with:
           tool: taplo-cli
       - name: Run Taplo
@@ -38,13 +38,16 @@ jobs:
   prettier-fmt:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7 # Check out the repository first.
-      - uses: actionsx/prettier@v3
+      - name: Fetch Repository
+        uses: actions/checkout@v7
+      - name: Run Prettier
+        uses: creyD/prettier_action@v4.6
         with:
-          # prettier CLI arguments.
-          args:
-            --check '**/*.{md,js,ts,jsx,tsx,json,yml,yaml,css,scss,html}'
-            '!CHANGELOG.md'
+          dry: true
+          prettier_version: 3.9.6
+          prettier_options:
+            --check **/*.{md,js,ts,jsx,tsx,json,yml,yaml,css,scss,html}
+            !CHANGELOG.md
 
   define-matrix:
     runs-on: ubuntu-latest
@@ -111,7 +114,7 @@ jobs:
         with:
           toolchain: nightly
       - name: Install cargo-llvm-cov
-        uses: taiki-e/install-action@v2.85.10
+        uses: taiki-e/install-action@v2.87.0
         with:
           tool: cargo-llvm-cov
       - name: Gather coverage
@@ -138,6 +141,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Decide whether the needed jobs succeeded or failed
-        uses: re-actors/alls-green@v1.2.2
+        uses: re-actors/alls-green@v1.3.0
         with:
           jobs: ${{ toJSON(needs) }}
