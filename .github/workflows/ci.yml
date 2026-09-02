@@ -38,13 +38,16 @@ jobs:
   prettier-fmt:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7 # Check out the repository first.
-      - uses: actionsx/prettier@v3
+      - name: Fetch Repository
+        uses: actions/checkout@v7
+      - name: Run Prettier
+        uses: creyD/prettier_action@v4.6
         with:
-          # prettier CLI arguments.
-          args:
-            --check '**/*.{md,js,ts,jsx,tsx,json,yml,yaml,css,scss,html}'
-            '!CHANGELOG.md'
+          dry: true
+          prettier_version: 3.9.6
+          prettier_options:
+            --check **/*.{md,js,ts,jsx,tsx,json,yml,yaml,css,scss,html}
+            !CHANGELOG.md
 
   define-matrix:
     runs-on: ubuntu-latest
