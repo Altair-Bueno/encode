@@ -5,7 +5,7 @@ use crate::Encodable;
 // https://users.rust-lang.org/t/macro-to-impl-trait-for-tuple/79165/3
 macro_rules! impl_encodable_for_tuple {
     ($($T:tt)*) => {
-        paste::paste! {
+        pastey::paste! {
             impl<ENC, A, $($T,)*> Encodable<ENC> for (A,$($T,)*)
             where
                 ENC: BaseEncoder,
