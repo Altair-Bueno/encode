@@ -7,11 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.1.0](https://github.com/Altair-Bueno/encode/compare/v1.0.0...v1.1.0) - 2026-09-02
-
-### Added
-
-- improve the json example with alternative formatting ([#34](https://github.com/Altair-Bueno/encode/pull/34))
+## [1.0.1](https://github.com/Altair-Bueno/encode/compare/v1.0.0...v1.0.1) - 2026-09-02
 
 ### Fixed
 
@@ -26,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - *(deps)* bump taiki-e/install-action from 2.85.5 to 2.85.10 in the github-actions-updates group ([#40](https://github.com/Altair-Bueno/encode/pull/40))
 - *(deps)* bump taiki-e/install-action from 2 to 2.85.5 in the github-actions-updates group ([#39](https://github.com/Altair-Bueno/encode/pull/39))
 - *(deps)* bump the github-actions-updates group across 1 directory with 3 updates ([#38](https://github.com/Altair-Bueno/encode/pull/38))
+- improve the json example with alternative formatting ([#34](https://github.com/Altair-Bueno/encode/pull/34))
 - Switch coverage tooling from cargo-tarpaulin to cargo-llvm-cov ([#33](https://github.com/Altair-Bueno/encode/pull/33))
 - *(deps)* bump codecov/codecov-action ([#32](https://github.com/Altair-Bueno/encode/pull/32))
 - *(deps)* bump actions/cache in the github-actions-updates group ([#31](https://github.com/Altair-Bueno/encode/pull/31))
