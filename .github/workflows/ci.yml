@@ -38,13 +38,14 @@ jobs:
   prettier-fmt:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7 # Check out the repository first.
-      - uses: actionsx/prettier@v3
+      - name: Fetch Repository
+        uses: actions/checkout@v7
+      - name: Setup Biome
+        uses: biomejs/setup-biome@v2
         with:
-          # prettier CLI arguments.
-          args:
-            --check '**/*.{md,js,ts,jsx,tsx,json,yml,yaml,css,scss,html}'
-            '!CHANGELOG.md'
+          version: v2.5.11
+      - name: Run Biome
+        run: biome ci .
 
   define-matrix:
     runs-on: ubuntu-latest
