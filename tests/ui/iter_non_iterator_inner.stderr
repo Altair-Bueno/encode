@@ -1,0 +1,16 @@
+error[E0599]: the method `encode` exists for struct `encode::combinators::Iter<&str>`, but its trait bounds were not satisfied
+ --> tests/ui/iter_non_iterator_inner.rs:6:24
+  |
+6 |     Iter::new("hello").encode(&mut buf).unwrap();
+  |                        ^^^^^^ method cannot be called on `encode::combinators::Iter<&str>` due to unsatisfied trait bounds
+  |
+ ::: src/combinators/iter.rs
+  |
+  | pub struct Iter<I> {
+  | ------------------ doesn't satisfy `encode::combinators::Iter<&str>: Encodable<_>`
+  |
+  = note: the following trait bounds were not satisfied:
+          `&str: IntoIterator`
+          which is required by `encode::combinators::Iter<&str>: Encodable<_>`
+          `&str: Iterator`
+          which is required by `encode::combinators::Iter<&str>: Encodable<_>`
