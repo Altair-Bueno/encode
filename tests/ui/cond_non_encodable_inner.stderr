@@ -1,0 +1,14 @@
+error[E0599]: the method `encode` exists for struct `Cond<u16, {closure@$DIR/tests/ui/cond_non_encodable_inner.rs:6:21: 6:30}>`, but its trait bounds were not satisfied
+ --> tests/ui/cond_non_encodable_inner.rs:6:37
+  |
+6 |     Cond::new(5u16, |_: &u16| true).encode(&mut buf).unwrap();
+  |                                     ^^^^^^ method cannot be called due to unsatisfied trait bounds
+  |
+ ::: src/combinators/cond.rs
+  |
+  | pub struct Cond<E, F> {
+  | --------------------- doesn't satisfy `_: Encodable<_>`
+  |
+  = note: the following trait bounds were not satisfied:
+          `u16: Encodable<_>`
+          which is required by `Cond<u16, {closure@$DIR/tests/ui/cond_non_encodable_inner.rs:6:21: 6:30}>: Encodable<_>`

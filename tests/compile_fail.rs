@@ -27,3 +27,9 @@ fn be_rejects_non_numeric_inner_type() {
     let t = trybuild::TestCases::new();
     t.compile_fail("tests/ui/be_non_numeric_inner.rs");
 }
+
+#[test]
+fn cond_rejects_non_encodable_inner_type() {
+    let t = trybuild::TestCases::new();
+    t.compile_fail("tests/ui/cond_non_encodable_inner.rs");
+}

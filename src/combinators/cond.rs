@@ -1,5 +1,4 @@
 use core::borrow::Borrow;
-use core::ops::Deref;
 
 ///  Encodes a value only if a condition is met
 ///
@@ -62,13 +61,6 @@ impl<E, F> Borrow<E> for Cond<E, F> {
         &self.encodable
     }
 }
-impl<E, F> Deref for Cond<E, F> {
-    type Target = E;
-    #[inline]
-    fn deref(&self) -> &Self::Target {
-        self.as_ref()
-    }
-}
 
 impl<Encodable, Encoder, F> crate::Encodable<Encoder> for Cond<Encodable, F>
 where
@@ -119,12 +111,6 @@ mod tests {
         let cond = Cond::new(42u8, |_: &u8| true);
         let (val, _) = cond.into_inner();
         assert_eq!(val, 42u8);
-    }
-
-    #[test]
-    fn assert_that_cond_deref_works() {
-        let cond = Cond::new(42u8, |_: &u8| true);
-        assert_eq!(*cond, 42u8);
     }
 
     #[test]
