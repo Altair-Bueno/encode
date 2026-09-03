@@ -1,7 +1,6 @@
 use core::borrow::Borrow;
 use core::fmt::Debug;
 use core::marker::PhantomData;
-use core::ops::Deref;
 
 /// Encodes a length prefixed value ([TLV](https://en.wikipedia.org/wiki/Type–length–value)).
 ///
@@ -58,13 +57,6 @@ impl<Encodable, Length, Error> AsRef<Encodable> for LengthPrefix<Encodable, Leng
     }
 }
 
-impl<Encodable, Length, Error> Deref for LengthPrefix<Encodable, Length, Error> {
-    type Target = Encodable;
-    #[inline]
-    fn deref(&self) -> &Self::Target {
-        self.as_ref()
-    }
-}
 
 impl<Encodable, Length, Error> Borrow<Encodable> for LengthPrefix<Encodable, Length, Error> {
     #[inline]
@@ -191,21 +183,9 @@ mod tests {
     }
 
     #[test]
-    fn assert_that_length_prefix_from_works() {
-        let lp: LengthPrefix<u8, u8, TryFromIntError> = 42u8.into();
-        assert_eq!(*lp, 42u8);
-    }
-
-    #[test]
     fn assert_that_length_prefix_as_ref_works() {
         let lp = LengthPrefix::<u8, u8, TryFromIntError>::new(42u8);
         assert_eq!(lp.as_ref(), &42u8);
-    }
-
-    #[test]
-    fn assert_that_length_prefix_deref_works() {
-        let lp = LengthPrefix::<u8, u8, TryFromIntError>::new(42u8);
-        assert_eq!(*lp, 42u8);
     }
 
     #[test]
@@ -213,19 +193,6 @@ mod tests {
         let lp = LengthPrefix::<u8, u8, TryFromIntError>::new(42u8);
         let borrowed: &u8 = lp.borrow();
         assert_eq!(*borrowed, 42u8);
-    }
-
-    #[test]
-    fn assert_that_length_prefix_clone_works() {
-        let lp = LengthPrefix::<u8, u8, TryFromIntError>::new(42u8);
-        let clone = lp.clone();
-        assert_eq!(*lp, *clone);
-    }
-
-    #[test]
-    fn assert_that_length_prefix_default_works() {
-        let lp = LengthPrefix::<u8, u8, TryFromIntError>::default();
-        assert_eq!(*lp, 0u8);
     }
 
     #[rstest]

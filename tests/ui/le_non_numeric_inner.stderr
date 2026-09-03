@@ -1,0 +1,5 @@
+error[E0599]: no method named `encode` found for struct `LE<E>` in the current scope
+ --> tests/ui/le_non_numeric_inner.rs:6:22
+  |
+6 |     LE::new("hello").encode(&mut buf).unwrap();
+  |                      ^^^^^^ method not found in `LE<&str>`

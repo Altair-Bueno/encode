@@ -1,0 +1,9 @@
+error[E0271]: type mismatch resolving `<Vec<u8> as BaseEncoder>::Error == ()`
+ --> tests/ui/from_error_non_convertible_error.rs:6:45
+  |
+6 |     FromError::<_, ()>::new("hello").encode(&mut buf).unwrap();
+  |                                      ------ ^^^^^^^^ expected `()`, found `Infallible`
+  |                                      |
+  |                                      required by a bound introduced by this call
+  |
+  = note: required for `FromError<&str, ()>` to implement `Encodable<Vec<u8>>`
