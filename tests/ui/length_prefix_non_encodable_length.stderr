@@ -1,0 +1,17 @@
+error[E0599]: the method `encode` exists for struct `LengthPrefix<&str, u32, TryFromIntError>`, but its trait bounds were not satisfied
+ --> tests/ui/length_prefix_non_encodable_length.rs:8:10
+  |
+7 | /     LengthPrefix::<_, u32, TryFromIntError>::new("hello")
+8 | |         .encode(&mut buf)
+  | |         -^^^^^^ method cannot be called on `LengthPrefix<&str, u32, TryFromIntError>` due to unsatisfied trait bounds
+  | |_________|
+  |
+  |
+ ::: src/combinators/length_prefix.rs
+  |
+  |   pub struct LengthPrefix<Encodable, Length, Error> {
+  |   ------------------------------------------------- doesn't satisfy `_: Encodable<_>`
+  |
+  = note: the following trait bounds were not satisfied:
+          `u32: Encodable<_>`
+          which is required by `LengthPrefix<&str, u32, TryFromIntError>: Encodable<_>`
