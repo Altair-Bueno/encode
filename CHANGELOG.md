@@ -7,10 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
-
-- Add `bytemuck` feature with a `Pod` combinator that encodes any `bytemuck::Pod` value as its raw byte representation
-
 ## [1.0.1](https://github.com/Altair-Bueno/encode/compare/v1.0.0...v1.0.1) - 2026-09-02
 
 ### Fixed
