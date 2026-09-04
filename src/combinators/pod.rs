@@ -1,5 +1,4 @@
 use core::borrow::Borrow;
-use core::ops::Deref;
 
 use crate::ByteEncoder;
 use crate::Encodable;
@@ -65,14 +64,6 @@ impl<T> Borrow<T> for Pod<T> {
         &self.value
     }
 }
-impl<T> Deref for Pod<T> {
-    type Target = T;
-
-    #[inline]
-    fn deref(&self) -> &Self::Target {
-        &self.value
-    }
-}
 
 impl<E, T> Encodable<E> for Pod<T>
 where
@@ -107,12 +98,6 @@ mod tests {
     fn assert_that_pod_into_inner_returns_the_value() {
         let pod = Pod::new(42u32);
         assert_eq!(pod.into_inner(), 42u32);
-    }
-
-    #[test]
-    fn assert_that_pod_deref_works() {
-        let pod = Pod::new(42u32);
-        assert_eq!(*pod, 42u32);
     }
 
     #[test]
