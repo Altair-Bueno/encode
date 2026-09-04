@@ -138,6 +138,30 @@ impl_try_from_le_for_num!(u8 u16 u32 u64 u128 i8 i16 i32 i64 i128);
 impl_encodeable_le_for_num!(u8 u16 u32 u64 u128 i8 i16 i32 i64 i128 f32 f64);
 impl_encodeable_le_for_nonzero_num!(u8 u16 u32 u64 u128 i8 i16 i32 i64 i128);
 
+/// Encodes the raw representation of a [`Pod`] value in little-endian order.
+///
+/// The byte order applies to the representation as a whole: the bytes are
+/// emitted in reverse whenever the host order differs. See [`Pod`] for when
+/// that is meaningful.
+#[cfg(feature = "bytemuck")]
+impl<E, T> Encodable<E> for LE<super::Pod<T>>
+where
+    E: ByteEncoder,
+    T: bytemuck::Pod,
+{
+    type Error = E::Error;
+
+    #[inline]
+    fn encode(&self, encoder: &mut E) -> Result<(), Self::Error> {
+        let bytes = bytemuck::bytes_of(self.num.as_ref());
+        if cfg!(target_endian = "little") {
+            encoder.put_slice(bytes)
+        } else {
+            bytes.iter().rev().try_for_each(|&b| encoder.put_byte(b))
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use core::borrow::Borrow;
