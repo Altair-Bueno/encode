@@ -138,6 +138,24 @@ impl_try_from_be_for_num!(u8 u16 u32 u64 u128 i8 i16 i32 i64 i128);
 impl_encodeable_be_for_num!(u8 u16 u32 u64 u128 i8 i16 i32 i64 i128 f32 f64);
 impl_encodeable_be_for_nonzero_num!(u8 u16 u32 u64 u128 i8 i16 i32 i64 i128);
 
+/// Encodes the raw representation of a [`Pod`](super::Pod) value.
+///
+/// Big-endian targets only: a raw representation cannot be
+/// meaningfully reversed, so there is no such impl on little-endian targets.
+#[cfg(all(feature = "bytemuck", target_endian = "big"))]
+impl<E, T> Encodable<E> for BE<super::Pod<T>>
+where
+    E: ByteEncoder,
+    T: bytemuck::Pod,
+{
+    type Error = E::Error;
+
+    #[inline]
+    fn encode(&self, encoder: &mut E) -> Result<(), Self::Error> {
+        encoder.put_slice(bytemuck::bytes_of(self.num.as_ref()))
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use core::borrow::Borrow;

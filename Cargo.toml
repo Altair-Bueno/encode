@@ -21,6 +21,7 @@ std = ["alloc"]
 alloc = []
 arrayvec = ["dep:arrayvec"]
 bytes = ["dep:bytes"]
+bytemuck = ["dep:bytemuck"]
 
 [dev-dependencies]
 rstest = "0.18"
@@ -28,6 +29,7 @@ rstest = "0.18"
 [dependencies]
 arrayvec = { version = "0.7.6", optional = true, default-features = false }
 bytes = { version = "1.10.1", optional = true, default-features = false }
+bytemuck = { version = "1.25.2", optional = true, default-features = false }
 pastey = "0.2"
 
 [[example]]

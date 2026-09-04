@@ -83,12 +83,24 @@ These types are supported when the `bytes` feature is enabled.
 
 "
 )]
+#[cfg_attr(
+    feature = "bytemuck",
+    doc = r"## Bytemuck Combinators (requires the `bytemuck` feature)
+These types are supported when the `bytemuck` feature is enabled.
+| Type | Description |
+|------|-------------|
+| [`Pod`] | Encodes any [`bytemuck::Pod`] value as its raw byte representation, wrapped in [`LE`] or [`BE`] |
+
+"
+)]
 mod be;
 mod cond;
 mod from_error;
 mod iter;
 mod le;
 mod length_prefix;
+#[cfg(feature = "bytemuck")]
+mod pod;
 mod separated;
 
 pub use be::BE;
@@ -97,4 +109,6 @@ pub use from_error::FromError;
 pub use iter::Iter;
 pub use le::LE;
 pub use length_prefix::LengthPrefix;
+#[cfg(feature = "bytemuck")]
+pub use pod::Pod;
 pub use separated::Separated;
