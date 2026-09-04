@@ -46,7 +46,7 @@ crate.
 - `bytes`: Implements [`Encodable`] and [`ByteEncoder`] for [`bytes::BytesMut`].
   Implements [`Encodable`] for [`bytes::Bytes`].
 - `bytemuck`: Adds the [`Pod`](combinators::Pod) combinator, which implements
-  [`Encodable`] for any [`bytemuck::Pod`].
+  [`Encodable`] for any [`bytemuck::Pod`] wrapped in the native endianness type.
 
 ## FAQs
 

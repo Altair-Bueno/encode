@@ -89,7 +89,7 @@ These types are supported when the `bytes` feature is enabled.
 These types are supported when the `bytemuck` feature is enabled.
 | Type | Description |
 |------|-------------|
-| [`Pod`] | Encodes any [`bytemuck::Pod`] value as its raw byte representation |
+| [`Pod`] | Encodes any [`bytemuck::Pod`] value as its raw byte representation, wrapped in [`LE`] or [`BE`] |
 
 "
 )]
