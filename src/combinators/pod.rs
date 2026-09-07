@@ -9,7 +9,11 @@ use crate::Encodable;
 /// structs, without having to manually implement [`Encodable`](crate::Encodable)
 /// for them.
 ///
-/// The value is written in the target platform's native byte order.
+/// The value is written in the target platform's native byte order, so the
+/// output is **not portable** across platforms with different endianness. For
+/// a stable wire format, encode the individual fields with the
+/// [`LE`](crate::combinators::LE) or [`BE`](crate::combinators::BE)
+/// combinators instead.
 ///
 /// # Examples
 ///
