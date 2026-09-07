@@ -1,7 +1,6 @@
 use core::borrow::Borrow;
 use core::fmt::Debug;
 use core::marker::PhantomData;
-use core::ops::Deref;
 
 /// Transforms the error type of an encodable.
 ///
@@ -44,13 +43,6 @@ impl<E, DstError> FromError<E, DstError> {
     }
 }
 
-impl<E, DstError> Deref for FromError<E, DstError> {
-    type Target = E;
-    #[inline]
-    fn deref(&self) -> &Self::Target {
-        self.as_ref()
-    }
-}
 impl<E, DstError> AsRef<E> for FromError<E, DstError> {
     #[inline]
     fn as_ref(&self) -> &E {
@@ -156,12 +148,6 @@ mod tests {
     }
 
     #[test]
-    fn assert_that_from_error_deref_works() {
-        let fe = FromError::<_, Infallible>::new(42u8);
-        assert_eq!(*fe, 42u8);
-    }
-
-    #[test]
     fn assert_that_from_error_as_ref_works() {
         let fe = FromError::<_, Infallible>::new(42u8);
         assert_eq!(fe.as_ref(), &42u8);
@@ -178,13 +164,13 @@ mod tests {
     fn assert_that_from_error_clone_works() {
         let fe = FromError::<_, Infallible>::new(42u8);
         let clone = fe.clone();
-        assert_eq!(*fe, *clone);
+        assert_eq!(fe.as_ref(), clone.as_ref());
     }
 
     #[test]
     fn assert_that_from_error_default_works() {
         let fe = FromError::<u8, Infallible>::default();
-        assert_eq!(*fe, 0u8);
+        assert_eq!(fe.into_inner(), 0u8);
     }
 
     #[rstest]
@@ -199,6 +185,7 @@ mod tests {
         let fe1 = FromError::<_, Infallible>::new(a);
         let fe2 = FromError::<_, Infallible>::new(b);
         assert_eq!(fe1.cmp(&fe2), expected);
+        assert_eq!(fe1.partial_cmp(&fe2), Some(expected));
         assert_eq!(fe1 == fe2, expected == core::cmp::Ordering::Equal);
     }
 

@@ -1,6 +1,5 @@
 use core::borrow::Borrow;
 use core::num::NonZero;
-use core::ops::Deref;
 
 use crate::ByteEncoder;
 use crate::Encodable;
@@ -49,14 +48,6 @@ impl<E> AsRef<E> for BE<E> {
 impl<E> Borrow<E> for BE<E> {
     #[inline]
     fn borrow(&self) -> &E {
-        &self.num
-    }
-}
-impl<E> Deref for BE<E> {
-    type Target = E;
-
-    #[inline]
-    fn deref(&self) -> &Self::Target {
         &self.num
     }
 }
@@ -185,12 +176,6 @@ mod tests {
     fn assert_that_be_into_inner_returns_the_value() {
         let be = BE::new(42u32);
         assert_eq!(be.into_inner(), 42u32);
-    }
-
-    #[test]
-    fn assert_that_be_deref_works() {
-        let be = BE::new(42u32);
-        assert_eq!(*be, 42u32);
     }
 
     #[test]
