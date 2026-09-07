@@ -1,5 +1,4 @@
 use core::borrow::Borrow;
-use core::ops::Deref;
 
 /// Encodes a sequence of encodables.
 ///
@@ -52,14 +51,6 @@ impl<I> Borrow<I> for Iter<I> {
         &self.encodable_iter
     }
 }
-impl<I> Deref for Iter<I> {
-    type Target = I;
-
-    #[inline]
-    fn deref(&self) -> &Self::Target {
-        &self.encodable_iter
-    }
-}
 
 impl<EncodableIter, Encoder> crate::Encodable<Encoder> for Iter<EncodableIter>
 where
@@ -106,12 +97,6 @@ mod tests {
         let iter = Iter::new([1u8, 2, 3]);
         let val = iter.into_inner();
         assert_eq!(val, [1u8, 2, 3]);
-    }
-
-    #[test]
-    fn assert_that_iter_deref_works() {
-        let iter = Iter::new([1u8, 2, 3]);
-        assert_eq!(iter.len(), 3);
     }
 
     #[test]

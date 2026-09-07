@@ -1,7 +1,6 @@
 use core::borrow::Borrow;
 use core::fmt::Debug;
 use core::marker::PhantomData;
-use core::ops::Deref;
 
 /// Encodes a length prefixed value ([TLV](https://en.wikipedia.org/wiki/Type–length–value)).
 ///
@@ -55,14 +54,6 @@ impl<Encodable, Length, Error> AsRef<Encodable> for LengthPrefix<Encodable, Leng
     #[inline]
     fn as_ref(&self) -> &Encodable {
         &self.encodable
-    }
-}
-
-impl<Encodable, Length, Error> Deref for LengthPrefix<Encodable, Length, Error> {
-    type Target = Encodable;
-    #[inline]
-    fn deref(&self) -> &Self::Target {
-        self.as_ref()
     }
 }
 
@@ -191,21 +182,9 @@ mod tests {
     }
 
     #[test]
-    fn assert_that_length_prefix_from_works() {
-        let lp: LengthPrefix<u8, u8, TryFromIntError> = 42u8.into();
-        assert_eq!(*lp, 42u8);
-    }
-
-    #[test]
     fn assert_that_length_prefix_as_ref_works() {
         let lp = LengthPrefix::<u8, u8, TryFromIntError>::new(42u8);
         assert_eq!(lp.as_ref(), &42u8);
-    }
-
-    #[test]
-    fn assert_that_length_prefix_deref_works() {
-        let lp = LengthPrefix::<u8, u8, TryFromIntError>::new(42u8);
-        assert_eq!(*lp, 42u8);
     }
 
     #[test]
@@ -216,16 +195,22 @@ mod tests {
     }
 
     #[test]
+    fn assert_that_length_prefix_from_works() {
+        let lp: LengthPrefix<u8, u8, TryFromIntError> = 42u8.into();
+        assert_eq!(lp.into_inner(), 42u8);
+    }
+
+    #[test]
     fn assert_that_length_prefix_clone_works() {
         let lp = LengthPrefix::<u8, u8, TryFromIntError>::new(42u8);
         let clone = lp.clone();
-        assert_eq!(*lp, *clone);
+        assert_eq!(lp.as_ref(), clone.as_ref());
     }
 
     #[test]
     fn assert_that_length_prefix_default_works() {
         let lp = LengthPrefix::<u8, u8, TryFromIntError>::default();
-        assert_eq!(*lp, 0u8);
+        assert_eq!(lp.into_inner(), 0u8);
     }
 
     #[rstest]
@@ -240,6 +225,7 @@ mod tests {
         let lp1 = LengthPrefix::<u8, u8, TryFromIntError>::new(a);
         let lp2 = LengthPrefix::<u8, u8, TryFromIntError>::new(b);
         assert_eq!(lp1.cmp(&lp2), expected);
+        assert_eq!(lp1.partial_cmp(&lp2), Some(expected));
         assert_eq!(lp1 == lp2, expected == core::cmp::Ordering::Equal);
     }
 
