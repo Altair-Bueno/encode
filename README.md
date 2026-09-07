@@ -43,10 +43,11 @@ crate.
 - `arrayvec`: Implements [`Encodable`] and [`ByteEncoder`] for
   [`arrayvec::ArrayVec`] and [`arrayvec::ArrayString`]. Implements
   [`StrEncoder`] for [`arrayvec::ArrayString`].
+- `bytemuck`: Adds the [`Pod`](combinators::Pod) combinator, which implements
+  [`Encodable`] for any [`bytemuck::Pod`] type, in the platform's native byte
+  order.
 - `bytes`: Implements [`Encodable`] and [`ByteEncoder`] for [`bytes::BytesMut`].
   Implements [`Encodable`] for [`bytes::Bytes`].
-- `bytemuck`: Adds the [`Pod`](combinators::Pod) combinator, which implements
-  [`Encodable`] for any [`bytemuck::Pod`] type, in the platform's native byte order.
 
 ## FAQs
 
