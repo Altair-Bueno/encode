@@ -57,7 +57,6 @@ impl<Encodable, Length, Error> AsRef<Encodable> for LengthPrefix<Encodable, Leng
     }
 }
 
-
 impl<Encodable, Length, Error> Borrow<Encodable> for LengthPrefix<Encodable, Length, Error> {
     #[inline]
     fn borrow(&self) -> &Encodable {
