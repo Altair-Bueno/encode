@@ -160,6 +160,19 @@ mod tests {
         assert_eq!(*borrowed, 42u8);
     }
 
+    #[test]
+    fn assert_that_from_error_clone_works() {
+        let fe = FromError::<_, Infallible>::new(42u8);
+        let clone = fe.clone();
+        assert_eq!(fe.as_ref(), clone.as_ref());
+    }
+
+    #[test]
+    fn assert_that_from_error_default_works() {
+        let fe = FromError::<u8, Infallible>::default();
+        assert_eq!(fe.into_inner(), 0u8);
+    }
+
     #[rstest]
     #[case::less(1u8, 2u8, core::cmp::Ordering::Less)]
     #[case::equal(42u8, 42u8, core::cmp::Ordering::Equal)]
@@ -172,6 +185,7 @@ mod tests {
         let fe1 = FromError::<_, Infallible>::new(a);
         let fe2 = FromError::<_, Infallible>::new(b);
         assert_eq!(fe1.cmp(&fe2), expected);
+        assert_eq!(fe1.partial_cmp(&fe2), Some(expected));
         assert_eq!(fe1 == fe2, expected == core::cmp::Ordering::Equal);
     }
 

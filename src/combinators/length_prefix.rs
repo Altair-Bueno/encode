@@ -194,6 +194,25 @@ mod tests {
         assert_eq!(*borrowed, 42u8);
     }
 
+    #[test]
+    fn assert_that_length_prefix_from_works() {
+        let lp: LengthPrefix<u8, u8, TryFromIntError> = 42u8.into();
+        assert_eq!(lp.into_inner(), 42u8);
+    }
+
+    #[test]
+    fn assert_that_length_prefix_clone_works() {
+        let lp = LengthPrefix::<u8, u8, TryFromIntError>::new(42u8);
+        let clone = lp.clone();
+        assert_eq!(lp.as_ref(), clone.as_ref());
+    }
+
+    #[test]
+    fn assert_that_length_prefix_default_works() {
+        let lp = LengthPrefix::<u8, u8, TryFromIntError>::default();
+        assert_eq!(lp.into_inner(), 0u8);
+    }
+
     #[rstest]
     #[case::less(1u8, 2u8, core::cmp::Ordering::Less)]
     #[case::equal(42u8, 42u8, core::cmp::Ordering::Equal)]
@@ -206,6 +225,7 @@ mod tests {
         let lp1 = LengthPrefix::<u8, u8, TryFromIntError>::new(a);
         let lp2 = LengthPrefix::<u8, u8, TryFromIntError>::new(b);
         assert_eq!(lp1.cmp(&lp2), expected);
+        assert_eq!(lp1.partial_cmp(&lp2), Some(expected));
         assert_eq!(lp1 == lp2, expected == core::cmp::Ordering::Equal);
     }
 
