@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.0](https://github.com/Altair-Bueno/encode/compare/v1.0.1...v2.0.0) - 2026-09-07
+
+### Added
+
+- Add bytemuck crate support for Pod types ([#49](https://github.com/Altair-Bueno/encode/pull/49))
+
+### Fixed
+
+- [**breaking**] remove `LengthPrefix` deref fallback that could silently drop length encoding ([#48](https://github.com/Altair-Bueno/encode/pull/48))
+
+### Other
+
+- *(deps)* bump taiki-e/install-action from 2.87.0 to 2.87.5 in the github-actions-updates group ([#51](https://github.com/Altair-Bueno/encode/pull/51))
+
 ## [1.0.1](https://github.com/Altair-Bueno/encode/compare/v1.0.0...v1.0.1) - 2026-09-02
 
 ### Fixed
