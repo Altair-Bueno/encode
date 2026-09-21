@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.1](https://github.com/Altair-Bueno/encode/compare/v2.0.0...v2.0.1) - 2026-09-21
+
+### Other
+
+- *(deps)* bump taiki-e/install-action ([#56](https://github.com/Altair-Bueno/encode/pull/56))
+- *(deps)* bump taiki-e/install-action ([#54](https://github.com/Altair-Bueno/encode/pull/54))
+
 ## [2.0.0](https://github.com/Altair-Bueno/encode/compare/v1.0.1...v2.0.0) - 2026-09-07
 
 ### Added
