@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.1](https://github.com/Altair-Bueno/encode/compare/v2.0.0...v2.0.1) - 2026-11-14
+
+### Fixed
+
+- encoder error state bugs in slice encoder and fmt::Arguments ([#63](https://github.com/Altair-Bueno/encode/pull/63))
+
+### Other
+
+- *(deps)* bump taiki-e/install-action ([#64](https://github.com/Altair-Bueno/encode/pull/64))
+- *(deps)* bump taiki-e/install-action ([#62](https://github.com/Altair-Bueno/encode/pull/62))
+- *(deps)* bump taiki-e/install-action ([#61](https://github.com/Altair-Bueno/encode/pull/61))
+- *(deps)* bump taiki-e/install-action ([#60](https://github.com/Altair-Bueno/encode/pull/60))
+- *(deps)* bump taiki-e/install-action ([#59](https://github.com/Altair-Bueno/encode/pull/59))
+- *(deps)* bump taiki-e/install-action ([#58](https://github.com/Altair-Bueno/encode/pull/58))
+- *(deps)* bump taiki-e/install-action ([#57](https://github.com/Altair-Bueno/encode/pull/57))
+- *(deps)* bump taiki-e/install-action ([#56](https://github.com/Altair-Bueno/encode/pull/56))
+- *(deps)* bump taiki-e/install-action ([#54](https://github.com/Altair-Bueno/encode/pull/54))
+
 ## [2.0.0](https://github.com/Altair-Bueno/encode/compare/v1.0.1...v2.0.0) - 2026-09-07
 
 ### Added
