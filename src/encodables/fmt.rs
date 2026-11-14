@@ -32,11 +32,14 @@ impl<E: StrEncoder> Encodable<E> for Arguments<'_> {
             error: None,
         };
 
-        if core::fmt::write(&mut adapter, *self).is_ok() {
-            Ok(())
-        } else {
-            Err(adapter.error.expect("Adapter always sets error on failure"))
+        let result = core::fmt::write(&mut adapter, *self);
+        if let Some(error) = adapter.error {
+            return Err(error);
         }
+        result.expect(
+            "a formatting trait implementation returned an error when the underlying stream did not",
+        );
+        Ok(())
     }
 }
 
@@ -68,5 +71,40 @@ mod tests {
         format_args!("Hello {}, I present you with a number: {}", "world", 42)
             .encode(&mut encoder)
             .unwrap_err();
+    }
+
+    struct FailingDisplay;
+
+    impl core::fmt::Display for FailingDisplay {
+        fn fmt(&self, _: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+            Err(core::fmt::Error)
+        }
+    }
+
+    struct ErrorSwallowingDisplay;
+
+    impl core::fmt::Display for ErrorSwallowingDisplay {
+        fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+            let _ = f.write_str("does not fit");
+            f.write_str("")
+        }
+    }
+
+    #[test]
+    #[should_panic(
+        expected = "a formatting trait implementation returned an error when the underlying stream did not"
+    )]
+    fn assert_that_arguments_panic_when_display_impls_raise_their_own_errors() {
+        let mut buf = [0u8; BUF_SIZE];
+        let mut encoder = &mut buf as &mut [u8];
+        let _ = format_args!("{FailingDisplay}").encode(&mut encoder);
+    }
+
+    #[test]
+    fn assert_that_arguments_report_encoder_errors_swallowed_by_display_impls() {
+        let mut buf = [0u8; 3];
+        let mut encoder = &mut buf as &mut [u8];
+        let result = format_args!("{ErrorSwallowingDisplay}").encode(&mut encoder);
+        assert!(result.is_err());
     }
 }

@@ -9,9 +9,10 @@ impl BaseEncoder for &mut [u8] {
 impl ByteEncoder for &mut [u8] {
     #[inline]
     fn put_slice(&mut self, slice: &[u8]) -> Result<(), Self::Error> {
-        let (a, b) = core::mem::take(self)
-            .split_at_mut_checked(slice.len())
-            .ok_or(InsufficientSpace)?;
+        if self.len() < slice.len() {
+            return Err(InsufficientSpace);
+        }
+        let (a, b) = core::mem::take(self).split_at_mut(slice.len());
         a.copy_from_slice(slice);
         *self = b;
         Ok(())
@@ -25,7 +26,31 @@ impl ByteEncoder for &mut [u8] {
 
 #[cfg(test)]
 mod test {
+    use crate::ByteEncoder;
     use crate::Encodable;
+
+    #[test]
+    fn assert_that_a_failed_write_keeps_the_remaining_space() {
+        let mut buf = [0u8; 8];
+        let mut encoder = &mut buf as &mut [u8];
+        encoder.put_slice(b"abc").unwrap();
+
+        encoder.put_slice(b"0123456789").unwrap_err();
+
+        assert_eq!(encoder.len(), 5);
+    }
+
+    #[test]
+    fn assert_that_writes_that_fit_succeed_after_a_failed_write() {
+        let mut buf = [0u8; 8];
+        let mut encoder = &mut buf as &mut [u8];
+        encoder.put_slice(b"abc").unwrap();
+        encoder.put_slice(b"0123456789").unwrap_err();
+
+        encoder.put_slice(b"de").unwrap();
+
+        assert_eq!(&buf[..5], b"abcde");
+    }
 
     #[test]
     fn assert_that_encoding_something_into_an_empty_slice_always_fails() {
